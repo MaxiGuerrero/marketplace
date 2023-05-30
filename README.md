@@ -1,1 +1,1 @@
-Marketplace by Maxi
+Marketplace monorepo by Maxi
