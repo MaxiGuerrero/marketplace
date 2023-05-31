@@ -1,18 +1,12 @@
 package main
 
 import (
-	"fmt"
 	authentication "marketplace/security-api/src/authentication/infrastructure"
-	server "marketplace/security-api/src/server"
-	shared "marketplace/security-api/src/shared"
+	s "marketplace/security-api/src/server"
 )
 
-var routes []server.Route
-
 func main(){
-	a := shared.GetEnv()
-	fmt.Println(a.DbConnection)
-	instance := server.CreateServer(8080)
-	routes = append(routes, authentication.GetRoutes()...)
-	instance.StartServer(&routes)
+	server := s.CreateServer(8080)
+	authentication.RegisterRoutes(server.App)
+	server.StartServer()
 }

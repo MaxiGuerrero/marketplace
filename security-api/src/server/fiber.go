@@ -9,25 +9,22 @@ import (
 
 type Server struct {
 	Port int
+    App *fiber.App
 }
-
-var app *fiber.App
 
 func CreateServer(port int) Server{
-    return Server{Port: 8080}
+    return Server{Port: 8080, App: fiber.New()}
 }
 
-func (server *Server) StartServer(routes *[]Route){
-    app = fiber.New()
-    registerRoutes(routes)
-    var error = app.Listen(fmt.Sprintf(":%v", server.Port))
+func (server *Server) StartServer(){
+    var error = server.App.Listen(fmt.Sprintf(":%v", server.Port))
     if error != nil {
         log.Fatalln("Error to start server: ", error)
     }
 }
 
 func (server *Server) StopServer(){
-    var error = app.Shutdown();
+    var error = server.App.Shutdown();
     if error != nil {
         log.Fatalln("Error to stop server: ", error)
     }
