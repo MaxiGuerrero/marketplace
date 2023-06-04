@@ -5,9 +5,7 @@ import (
 )
 
 
-func RegisterRoutes(router fiber.Router){
-	router.Get("/",func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+func RegisterRoutes(router fiber.Router, ac AuthenticationController){
+	router.Get("/",ac.login)
 }
 

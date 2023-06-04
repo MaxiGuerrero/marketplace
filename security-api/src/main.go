@@ -6,7 +6,8 @@ import (
 )
 
 func main(){
+	authDependencies := authentication.InitializeDependencies()
 	server := s.CreateServer(8080)
-	authentication.RegisterRoutes(server.App)
+	authentication.RegisterRoutes(server.App,*authDependencies.AuthenticationController)
 	server.StartServer()
 }
