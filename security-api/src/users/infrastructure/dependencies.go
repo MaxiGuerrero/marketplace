@@ -10,6 +10,6 @@ type Dependencies struct{
 
 func InitializeDependencies() *Dependencies{
 	return &Dependencies{
-		UserController: NewUserController(*service.NewUserService()),
+		UserController: NewUserController(*service.NewUserService(&UserRepository{})),
 	}
 }

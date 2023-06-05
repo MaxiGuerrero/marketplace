@@ -1,4 +1,4 @@
-package domain
+package models
 
 type LoginResponse struct {
 	IdUser string `json:"idUser"`

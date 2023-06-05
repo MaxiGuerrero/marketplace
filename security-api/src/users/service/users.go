@@ -1,11 +1,17 @@
 package service
 
-type UserService struct{}
+import repositories "marketplace/security-api/src/users/models" 
 
-func NewUserService() *UserService{
-	return &UserService{}
+type UserService struct{
+	userRepository repositories.IUserRepository
+}
+
+func NewUserService(userRepository repositories.IUserRepository) *UserService{
+	return &UserService{
+		userRepository,
+	}
 }
 
 func (us UserService) CreateUser(){
-
+	us.userRepository.Create()
 }

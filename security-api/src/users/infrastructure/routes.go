@@ -6,6 +6,6 @@ import (
 
 
 func RegisterRoutes(router fiber.Router, uc UserController){
-	router.Get("/users",uc.createUser)
+	router.Post("/users",uc.createUser)
 }
 
