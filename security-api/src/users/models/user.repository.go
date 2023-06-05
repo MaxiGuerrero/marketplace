@@ -1,7 +1,7 @@
 package models
 
 type IUserRepository interface {
-	Create()
+	Create(username,password,email string)
 	// Update()
 	// Delete()
 	// GetById() *User
