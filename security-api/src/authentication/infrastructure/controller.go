@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	s "marketplace/security-api/src/authentication/service"
+	response "marketplace/security-api/src/shared"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,11 +16,8 @@ func NewAuthenticationController(service s.AuthenticationService) *Authenticatio
 		service,
 	}
 }
-type Response struct{
-	Message string `json:"message"`
-} 
 
 func (ac AuthenticationController) login(c *fiber.Ctx) error{
 	result := ac.service.Login()
-	return c.Status(200).JSON(Response{Message: result})
+	return c.Status(200).JSON(response.Custom(result))
 }

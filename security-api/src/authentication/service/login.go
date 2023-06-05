@@ -1,4 +1,4 @@
-package application
+package service
 
 type AuthenticationService struct{}
 
