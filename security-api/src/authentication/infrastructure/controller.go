@@ -18,6 +18,7 @@ func NewAuthenticationController(service s.AuthenticationService) *Authenticatio
 }
 
 func (ac AuthenticationController) login(c *fiber.Ctx) error{
-	result := ac.service.Login()
-	return c.Status(200).JSON(response.Custom(result))
+	ac.service.Login()
+	c.Status(200).JSON(response.OK())
+	return nil
 }

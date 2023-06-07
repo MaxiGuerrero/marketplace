@@ -18,6 +18,9 @@ func NewUserController(service s.UserService) *UserController {
 }
 
 func (uc UserController) createUser(c *fiber.Ctx) error{
-	uc.service.CreateUser("test","test","test@gmail.com")
+	err := uc.service.CreateUser("test","test","test@gmail.com")
+	if err!=nil{
+		c.Status(400).JSON(response.BadRequest(err.Error()))
+	}
 	return c.Status(200).JSON(response.OK())
 }

@@ -11,8 +11,9 @@ type FakeUserRepository struct {
 	mock.Mock
 }
 
-func (ur FakeUserRepository) Create(username,password,email string){
+func (ur FakeUserRepository) Create(username,password,email string) error{
 	ur.Called(username,password,email)
+	return nil
 }
 
 func TestUserCreate(t *testing.T) {
@@ -21,8 +22,8 @@ func TestUserCreate(t *testing.T) {
 	t.Log("Create User")
 	t.Run("Create user sucessfully",func(t *testing.T) {
 		const username,password,email = "user","password","test@test.com"
-		t.Log("Create user sucessfully")
-		fakeRepo.On("Create", username, password, email).Return()
+		t.Log("Test if method create has been called, user created sucessfully")
+		fakeRepo.On("Create", username, password, email)
 		service.CreateUser(username,password,email)
 	})
 }

@@ -12,6 +12,6 @@ func NewUserService(userRepository repositories.IUserRepository) *UserService{
 	}
 }
 
-func (us UserService) CreateUser(username,password,email string){
-	us.userRepository.Create(username,password,email)
+func (us UserService) CreateUser(username,password,email string) error{
+	return us.userRepository.Create(username,password,email)
 }

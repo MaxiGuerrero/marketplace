@@ -12,8 +12,8 @@ type Server struct {
     App *fiber.App
 }
 
-func CreateServer(port int) Server{
-    return Server{Port: 8080, App: fiber.New()}
+func CreateServer(port int) *Server{
+    return &Server{Port: 8080, App: fiber.New()}
 }
 
 func (server *Server) StartServer(){

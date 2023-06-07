@@ -8,4 +8,3 @@ import (
 func RegisterRoutes(router fiber.Router, ac AuthenticationController){
 	router.Get("/",ac.login)
 }
-
