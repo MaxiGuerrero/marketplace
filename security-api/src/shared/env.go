@@ -3,20 +3,24 @@ package shared
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
-type env struct {
+type config struct {
 	DbConnection string
+	CostAlgorithmic int
 } 
 
-func GetEnv() *env{
+func GetConfig() *config{
 	if os.Getenv("GO_ENV") == "develop" || os.Getenv("GO_ENV") == "" {
 		loadDotEnv()
 	}
-	return &env{
+	CostAlgorithmic , _ := strconv.Atoi(os.Getenv("COST_ALGORITHMIC"))
+	return &config{
 		DbConnection: os.Getenv("DB_CONNECTION"),
+		CostAlgorithmic: CostAlgorithmic,
 	}
 }
 

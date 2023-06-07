@@ -16,9 +16,24 @@ func (ur FakeUserRepository) Create(username,password,email string) error{
 	return nil
 }
 
+type FakeEncrypter struct {
+	mock.Mock
+}
+
+func (encrypter FakeEncrypter) GenerateHash(password []byte) ([]byte, error){
+	encrypter.Called(password)
+	return nil,nil
+}
+
+func (encrypter FakeEncrypter) Compare(hashedPassword, password []byte) error{
+	encrypter.Called(hashedPassword,password)
+	return nil
+}
+
 func TestUserCreate(t *testing.T) {
 	fakeRepo := &FakeUserRepository{}
-	service := s.NewUserService(fakeRepo)
+	fakeEncrpypter := &FakeEncrypter{}
+	service := s.NewUserService(fakeRepo, fakeEncrpypter)
 	t.Log("Create User")
 	t.Run("Create user sucessfully",func(t *testing.T) {
 		const username,password,email = "user","password","test@test.com"
