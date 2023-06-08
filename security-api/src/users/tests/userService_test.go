@@ -4,6 +4,7 @@ import (
 	s "marketplace/security-api/src/users/service"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -32,18 +33,35 @@ func (encrypter FakeEncrypter) Compare(hashedPassword, password []byte) error{
 }
 
 func TestUserCreate(t *testing.T) {
-	fakeRepo := &FakeUserRepository{}
-	fakeEncrpypter := &FakeEncrypter{}
-	service := s.NewUserService(fakeRepo, fakeEncrpypter)
 	t.Log("Create User")
 	t.Run("Create user sucessfully",func(t *testing.T) {
+		// Arrenge
+		fakeRepo := &FakeUserRepository{}
+		fakeEncrpypter := &FakeEncrypter{}
+		service := s.NewUserService(fakeRepo, fakeEncrpypter)
 		const username,password,email = "user","password","test@test.com"
 		passwordEncrypted := []byte(password)
-		t.Log("Test if method GenerateHash has been called, retrun an mock password")
+		t.Log("Validate that GenerateHash has been called, retrun an mock password")
 		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil)
-		t.Log("Test if method create has been called, user created sucessfully, return nil")
+		t.Log("Validate that Create has been called, user created sucessfully, return nil")
 		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(nil)
+		// Act
 		err := service.CreateUser(username,password,email)
-		require.Nil(t,err,"Service does not return an error")
+		// Assert
+		require.NoError(t,err,"Service does not return an error")
+	})
+	t.Run("Error on encrypting",func(t *testing.T) {
+		// Arrenge
+		fakeRepo := &FakeUserRepository{}
+		fakeEncrpypter := &FakeEncrypter{}
+		service := s.NewUserService(fakeRepo, fakeEncrpypter)
+		const username,password,email = "user","password","test@test.com"
+		t.Log("Validate that GenerateHash has been called, retrun error")
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return([]byte{},assert.AnError)
+		fakeRepo.AssertNotCalled(t,"Create","Repository must not be called")
+		// Act
+		err := service.CreateUser(username,password,email)
+		// Assert
+		assert.Error(t,err,"Service return an error")
 	})
 }
