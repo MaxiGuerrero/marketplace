@@ -14,8 +14,8 @@ type FakeUserRepository struct {
 }
 
 func (ur FakeUserRepository) Create(username,password,email string) error{
-	ur.Called(username,password,email)
-	return nil
+	args := ur.Called(username,password,email)
+	return args.Error(0)
 }
 
 type FakeEncrypter struct {
@@ -34,31 +34,42 @@ func (encrypter FakeEncrypter) Compare(hashedPassword, password []byte) error{
 
 func TestUserCreate(t *testing.T) {
 	t.Log("Create User")
-	t.Run("Create user sucessfully",func(t *testing.T) {
+	t.Run("user created sucessfully",func(t *testing.T) {
 		// Arrenge
+		const username,password,email = "user","password","test@test.com"
 		fakeRepo := &FakeUserRepository{}
 		fakeEncrpypter := &FakeEncrypter{}
 		service := s.NewUserService(fakeRepo, fakeEncrpypter)
-		const username,password,email = "user","password","test@test.com"
 		passwordEncrypted := []byte(password)
-		t.Log("Validate that GenerateHash has been called, retrun an mock password")
 		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil)
-		t.Log("Validate that Create has been called, user created sucessfully, return nil")
 		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(nil)
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
 		require.NoError(t,err,"Service does not return an error")
 	})
-	t.Run("Error on encrypting",func(t *testing.T) {
+	t.Run("Error on encrypting, return error",func(t *testing.T) {
 		// Arrenge
+		const username,password,email = "user","password","test@test.com"
 		fakeRepo := &FakeUserRepository{}
 		fakeEncrpypter := &FakeEncrypter{}
 		service := s.NewUserService(fakeRepo, fakeEncrpypter)
-		const username,password,email = "user","password","test@test.com"
-		t.Log("Validate that GenerateHash has been called, retrun error")
 		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return([]byte{},assert.AnError)
 		fakeRepo.AssertNotCalled(t,"Create","Repository must not be called")
+		// Act
+		err := service.CreateUser(username,password,email)
+		// Assert
+		assert.Error(t,err,"Service return an error")
+	})
+	t.Run("Error on repository, return error",func(t *testing.T) {
+		// Arrenge
+		const username,password,email = "user","password","test@test.com"
+		fakeRepo := &FakeUserRepository{}
+		fakeEncrpypter := &FakeEncrypter{}
+		service := s.NewUserService(fakeRepo, fakeEncrpypter)
+		passwordEncrypted := []byte(password)
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil)
+		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(assert.AnError)
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
