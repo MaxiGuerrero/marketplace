@@ -15,5 +15,9 @@ func NewUserService(userRepository models.IUserRepository, encrypter models.IEnc
 }
 
 func (us UserService) CreateUser(username,password,email string) error{
-	return us.userRepository.Create(username,password,email)
+	hashedPassword,err := us.encrypter.GenerateHash([]byte(password))
+	if(err != nil){
+		return err
+	}
+	return us.userRepository.Create(username,string(hashedPassword),email)
 }

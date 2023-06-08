@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 type FakeUserRepository struct {
@@ -21,13 +22,13 @@ type FakeEncrypter struct {
 }
 
 func (encrypter FakeEncrypter) GenerateHash(password []byte) ([]byte, error){
-	encrypter.Called(password)
-	return nil,nil
+	args := encrypter.Called(password)
+	return args.Get(0).([]byte), args.Error(1)
 }
 
 func (encrypter FakeEncrypter) Compare(hashedPassword, password []byte) error{
-	encrypter.Called(hashedPassword,password)
-	return nil
+	args := encrypter.Called(hashedPassword,password)
+	return args.Error(0)
 }
 
 func TestUserCreate(t *testing.T) {
@@ -37,8 +38,12 @@ func TestUserCreate(t *testing.T) {
 	t.Log("Create User")
 	t.Run("Create user sucessfully",func(t *testing.T) {
 		const username,password,email = "user","password","test@test.com"
-		t.Log("Test if method create has been called, user created sucessfully")
-		fakeRepo.On("Create", username, password, email)
-		service.CreateUser(username,password,email)
+		passwordEncrypted := []byte(password)
+		t.Log("Test if method GenerateHash has been called, retrun an mock password")
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil)
+		t.Log("Test if method create has been called, user created sucessfully, return nil")
+		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(nil)
+		err := service.CreateUser(username,password,email)
+		require.Nil(t,err,"Service does not return an error")
 	})
 }
