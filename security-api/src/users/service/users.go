@@ -1,6 +1,9 @@
 package service
 
-import models "marketplace/security-api/src/users/models" 
+import (
+	"errors"
+	models "marketplace/security-api/src/users/models"
+) 
 
 type UserService struct{
 	userRepository models.IUserRepository
@@ -15,8 +18,15 @@ func NewUserService(userRepository models.IUserRepository, encrypter models.IEnc
 }
 
 func (us UserService) CreateUser(username,password,email string) error{
+	userFound,err := us.userRepository.GetByUsername(username)
+	if err != nil{
+		return err
+	}
+	if userFound != nil {
+		return errors.New("username already exists, please use another")
+	}
 	hashedPassword,err := us.encrypter.GenerateHash([]byte(password))
-	if(err != nil){
+	if err != nil{
 		return err
 	}
 	return us.userRepository.Create(username,string(hashedPassword),email)

@@ -5,5 +5,5 @@ type IUserRepository interface {
 	// Update()
 	// Delete()
 	// GetById() *User
-	// Get() *Users
+	GetByUsername(username string) (*User,error)
 }

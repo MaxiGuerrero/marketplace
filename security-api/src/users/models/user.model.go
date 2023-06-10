@@ -1,13 +1,32 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type Status int8
+
+const (
+	Active Status = iota
+	Blocked
+	Inactive
+)
+
+func (s Status) String() string{
+	return []string{"Active","Blocked","Inactive"}[s]
+}
 
 type User struct {
-	ID string
-	Username string
-	Email string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID primitive.ObjectID 	`bson:"_id"`
+	Username string 		`json:"username"`
+	Password string 		`json:"password"`
+	Email string			`json:"email"`
+	Status string           `json:"status"`
+	CreatedAt time.Time		`json:"created_at"`
+	UpdatedAt time.Time		`json:"updated_at,omitempty"`
+	DeletedAt time.Time     `json:"deleted_at,omitempty"`
 }
 
 type Users []User

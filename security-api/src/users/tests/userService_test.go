@@ -1,6 +1,7 @@
 package service
 
 import (
+	models "marketplace/security-api/src/users/models"
 	s "marketplace/security-api/src/users/service"
 	"testing"
 
@@ -13,63 +14,74 @@ type FakeUserRepository struct {
 	mock.Mock
 }
 
-func (ur FakeUserRepository) Create(username,password,email string) error{
+func (ur *FakeUserRepository) Create(username,password,email string) error{
 	args := ur.Called(username,password,email)
 	return args.Error(0)
+}
+
+func (ur *FakeUserRepository) GetByUsername(username string) (*models.User,error){
+	args := ur.Called(username)
+	if args.Get(0) == nil {
+		return nil,args.Error(1)
+	}
+	return args.Get(0).(*models.User),args.Error(1)
 }
 
 type FakeEncrypter struct {
 	mock.Mock
 }
 
-func (encrypter FakeEncrypter) GenerateHash(password []byte) ([]byte, error){
+func (encrypter *FakeEncrypter) GenerateHash(password []byte) ([]byte, error){
 	args := encrypter.Called(password)
 	return args.Get(0).([]byte), args.Error(1)
 }
 
-func (encrypter FakeEncrypter) Compare(hashedPassword, password []byte) error{
+func (encrypter *FakeEncrypter) Compare(hashedPassword, password []byte) error{
 	args := encrypter.Called(hashedPassword,password)
 	return args.Error(0)
 }
 
 func TestUserCreate(t *testing.T) {
+	const username,password,email = "user","password","test@test.com"
+	passwordEncrypted := []byte(password)
+	fakeRepo := &FakeUserRepository{}
+	fakeEncrpypter := &FakeEncrypter{}
+	service := s.NewUserService(fakeRepo, fakeEncrpypter)
 	t.Log("Create User")
 	t.Run("user created sucessfully",func(t *testing.T) {
 		// Arrenge
-		const username,password,email = "user","password","test@test.com"
-		fakeRepo := &FakeUserRepository{}
-		fakeEncrpypter := &FakeEncrypter{}
-		service := s.NewUserService(fakeRepo, fakeEncrpypter)
-		passwordEncrypted := []byte(password)
-		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil)
-		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(nil)
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil).Once()
+		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(nil).Once()
+		fakeRepo.On("GetByUsername", username).Return(nil,nil).Once()
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
 		require.NoError(t,err,"Service does not return an error")
 	})
-	t.Run("Error on encrypting, return error",func(t *testing.T) {
+	t.Run("user already exists, return error",func(t *testing.T) {
 		// Arrenge
-		const username,password,email = "user","password","test@test.com"
-		fakeRepo := &FakeUserRepository{}
-		fakeEncrpypter := &FakeEncrypter{}
-		service := s.NewUserService(fakeRepo, fakeEncrpypter)
-		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return([]byte{},assert.AnError)
-		fakeRepo.AssertNotCalled(t,"Create","Repository must not be called")
+		userFound := new(models.User)
+		fakeRepo.On("GetByUsername", username).Return(userFound,nil).Once()
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
+		require.Error(t,err,"Username already exists")
+	})
+	t.Run("Error on encrypting, return error",func(t *testing.T) {
+		// Arrenge
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return([]byte{},assert.AnError).Once()
+		fakeRepo.On("GetByUsername", username).Return(nil,nil).Once()
+		// Act
+		err := service.CreateUser(username,password,email)
+		// Assert
+		fakeRepo.AssertNotCalled(t,"Create","Repository must not be called")
 		assert.Error(t,err,"Service return an error")
 	})
 	t.Run("Error on repository, return error",func(t *testing.T) {
 		// Arrenge
-		const username,password,email = "user","password","test@test.com"
-		fakeRepo := &FakeUserRepository{}
-		fakeEncrpypter := &FakeEncrypter{}
-		service := s.NewUserService(fakeRepo, fakeEncrpypter)
-		passwordEncrypted := []byte(password)
-		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil)
-		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(assert.AnError)
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil).Once()
+		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(assert.AnError).Once()
+		fakeRepo.On("GetByUsername", username).Return(nil,nil).Once()
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
