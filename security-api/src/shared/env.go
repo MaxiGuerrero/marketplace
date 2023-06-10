@@ -11,6 +11,7 @@ import (
 type config struct {
 	DbConnection string
 	CostAlgorithmic int
+	Database string
 } 
 
 func GetConfig() *config{
@@ -21,6 +22,7 @@ func GetConfig() *config{
 	return &config{
 		DbConnection: os.Getenv("DB_CONNECTION"),
 		CostAlgorithmic: CostAlgorithmic,
+		Database: os.Getenv("DATABASE"),
 	}
 }
 

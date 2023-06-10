@@ -1,10 +1,19 @@
 package infrastructure
 
-import "log"
+import (
+	"context"
+	"log"
+	mongo "marketplace/security-api/src/shared/database"
+)
 
-type UserRepository struct{}
+var ctx context.Context = context.Background()
+
+type UserRepository struct{
+	db mongo.DbConnector
+}
 
 func (u UserRepository) Create(username,password,email string) error{
+	// u.db.GetCollection("user").InsertOne(ctx,)
 	log.Println("User created!! =D")
 	return nil
 }
