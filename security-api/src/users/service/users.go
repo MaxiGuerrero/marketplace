@@ -18,10 +18,7 @@ func NewUserService(userRepository models.IUserRepository, encrypter models.IEnc
 }
 
 func (us UserService) CreateUser(username,password,email string) error{
-	userFound,err := us.userRepository.GetByUsername(username)
-	if err != nil{
-		return err
-	}
+	userFound, _ := us.userRepository.GetByUsername(username)
 	if userFound != nil {
 		return errors.New("username already exists, please use another")
 	}

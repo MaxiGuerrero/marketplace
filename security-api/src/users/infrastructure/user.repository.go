@@ -36,9 +36,6 @@ func (u UserRepository) Create(username,password,email string) error{
 func (u UserRepository) GetByUsername(username string) (*model.User,error){
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
 	result := u.db.GetCollection("user").FindOne(ctx,filter)
-	if result.Err() != nil {
-		return nil,result.Err()
-	}
 	userFound := new(model.User)
 	err := result.Decode(&userFound)
 	if err != nil {
