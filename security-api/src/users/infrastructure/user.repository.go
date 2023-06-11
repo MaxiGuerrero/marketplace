@@ -3,21 +3,22 @@ package infrastructure
 import (
 	"context"
 	"log"
-	mongo "marketplace/security-api/src/shared/database"
+	database "marketplace/security-api/src/shared/database"
 	model "marketplace/security-api/src/users/models"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var ctx context.Context = context.Background()
 
 type UserRepository struct{
-	db mongo.DbConnector
+	db database.DbConnector
 }
 
-func (u UserRepository) Create(username,password,email string) error{
+func (u UserRepository) Create(username,password,email string){
 	_,err := u.db.GetCollection("user").InsertOne(ctx,model.User{
 		Username: username,
 		Password: password,
@@ -27,19 +28,20 @@ func (u UserRepository) Create(username,password,email string) error{
 		UpdatedAt: time.Now(),
 	})
 	if err != nil{
-		return err
+		log.Panicf("Error on create user document: %v",err.Error())
 	}
 	log.Printf("User %v has been created",username)
-	return nil
 }
 
-func (u UserRepository) GetByUsername(username string) (*model.User,error){
+func (u UserRepository) GetByUsername(username string) *model.User{
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
-	result := u.db.GetCollection("user").FindOne(ctx,filter)
 	userFound := new(model.User)
-	err := result.Decode(&userFound)
-	if err != nil {
-		return nil, err
+	err := u.db.GetCollection("user").FindOne(ctx,filter).Decode(&userFound)
+	if err != nil { 
+		if err == mongo.ErrNoDocuments {
+			return nil
+		}
+		log.Panicf("Error on database: %v",err.Error())
 	}
-	return userFound,nil
+	return userFound
 }

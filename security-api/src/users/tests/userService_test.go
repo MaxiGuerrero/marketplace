@@ -5,7 +5,6 @@ import (
 	s "marketplace/security-api/src/users/service"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -14,31 +13,30 @@ type FakeUserRepository struct {
 	mock.Mock
 }
 
-func (ur *FakeUserRepository) Create(username,password,email string) error{
-	args := ur.Called(username,password,email)
-	return args.Error(0)
+func (ur *FakeUserRepository) Create(username,password,email string){
+	ur.Called(username,password,email)
 }
 
-func (ur *FakeUserRepository) GetByUsername(username string) (*models.User,error){
+func (ur *FakeUserRepository) GetByUsername(username string) *models.User{
 	args := ur.Called(username)
 	if args.Get(0) == nil {
-		return nil,args.Error(1)
+		return nil
 	}
-	return args.Get(0).(*models.User),args.Error(1)
+	return args.Get(0).(*models.User)
 }
 
 type FakeEncrypter struct {
 	mock.Mock
 }
 
-func (encrypter *FakeEncrypter) GenerateHash(password []byte) ([]byte, error){
+func (encrypter *FakeEncrypter) GenerateHash(password []byte) []byte{
 	args := encrypter.Called(password)
-	return args.Get(0).([]byte), args.Error(1)
+	return args.Get(0).([]byte)
 }
 
-func (encrypter *FakeEncrypter) Compare(hashedPassword, password []byte) error{
+func (encrypter *FakeEncrypter) Compare(hashedPassword, password []byte) bool{
 	args := encrypter.Called(hashedPassword,password)
-	return args.Error(0)
+	return args.Get(0).(bool)
 }
 
 func TestUserCreate(t *testing.T) {
@@ -50,9 +48,9 @@ func TestUserCreate(t *testing.T) {
 	t.Log("Create User")
 	t.Run("user created sucessfully",func(t *testing.T) {
 		// Arrenge
-		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil).Once()
-		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(nil).Once()
-		fakeRepo.On("GetByUsername", username).Return(nil,nil).Once()
+		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted).Once()
+		fakeRepo.On("Create", username, string(passwordEncrypted), email).Once()
+		fakeRepo.On("GetByUsername", username).Return(nil).Once()
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
@@ -61,30 +59,10 @@ func TestUserCreate(t *testing.T) {
 	t.Run("user already exists, return error",func(t *testing.T) {
 		// Arrenge
 		userFound := new(models.User)
-		fakeRepo.On("GetByUsername", username).Return(userFound,nil).Once()
+		fakeRepo.On("GetByUsername", username).Return(userFound).Once()
 		// Act
 		err := service.CreateUser(username,password,email)
 		// Assert
 		require.Error(t,err,"Username already exists")
-	})
-	t.Run("Error on encrypting, return error",func(t *testing.T) {
-		// Arrenge
-		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return([]byte{},assert.AnError).Once()
-		fakeRepo.On("GetByUsername", username).Return(nil,nil).Once()
-		// Act
-		err := service.CreateUser(username,password,email)
-		// Assert
-		fakeRepo.AssertNotCalled(t,"Create","Repository must not be called")
-		assert.Error(t,err,"Service return an error")
-	})
-	t.Run("Error on repository, return error",func(t *testing.T) {
-		// Arrenge
-		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted,nil).Once()
-		fakeRepo.On("Create", username, string(passwordEncrypted), email).Return(assert.AnError).Once()
-		fakeRepo.On("GetByUsername", username).Return(nil,nil).Once()
-		// Act
-		err := service.CreateUser(username,password,email)
-		// Assert
-		assert.Error(t,err,"Service return an error")
 	})
 }

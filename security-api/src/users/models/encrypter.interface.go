@@ -1,6 +1,6 @@
 package models
 
 type IEncrypter interface{
-	GenerateHash(password []byte) ([]byte, error)
-	Compare(hashedPassword, password []byte) error
+	GenerateHash(password []byte) []byte
+	Compare(hashedPassword, password []byte) bool
 }
