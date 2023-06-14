@@ -1,11 +1,31 @@
 package service
 
-type AuthenticationService struct{}
+import (
+	"errors"
+	"marketplace/security-api/src/authentication/models"
+)
 
-func NewAuthenticationService() *AuthenticationService{
-	return &AuthenticationService{}
+type AuthenticationService struct{
+	encrypter models.IEncrypter
+	authenticationRepository models.IAuthenticationRepository
+	jwtBuilder models.JWTBuilder
 }
 
-func (as AuthenticationService) Login() string{
-	return "Hello World"
+func NewAuthenticationService(encrypter models.IEncrypter, authenticationRepository models.IAuthenticationRepository, jwtBuilder models.JWTBuilder) *AuthenticationService{
+	return &AuthenticationService{encrypter, authenticationRepository, jwtBuilder}
+}
+
+func (as AuthenticationService) Login(username, password string) (*models.UserToken,error){
+	userFound := as.authenticationRepository.GetByUsername(username)
+	if !as.encrypter.Compare([]byte(userFound.Password),[]byte(password)) {
+		return nil,errors.New("username or password is incorrect, try again")
+	}
+	token := as.jwtBuilder.BuildToken(&models.Payload{
+		UserId: userFound.ID,
+		Username: userFound.Username,
+		CreatedAt: userFound.CreatedAt,
+		UpdatedAt: userFound.UpdatedAt,
+		DeletedAt: userFound.DeletedAt,
+	})
+	return &models.UserToken{UserId: userFound.ID,Token: token},nil
 }

@@ -13,7 +13,7 @@ func main(){
 	ctx := context.Background()
 	connector := mongo.CreateDbConnector(ctx,config.GetConfig().DbConnection,config.GetConfig().Database)
 	// Dependencies' containers by each module - run injections
-	authDependencies := authentication.InitializeDependencies()
+	authDependencies := authentication.InitializeDependencies(connector)
 	usersDependencies := users.InitializeDependencies(connector)
 	// Create server
 	server := s.CreateServer(8080)
