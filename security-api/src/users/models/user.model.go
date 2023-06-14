@@ -19,7 +19,7 @@ func (s Status) String() string{
 }
 
 type User struct {
-	ID primitive.ObjectID 	`bson:"_id"`
+	ID primitive.ObjectID 	`bson:"_id,omitempty"`
 	Username string 		`json:"username"`
 	Password string 		`json:"password"`
 	Email string			`json:"email"`
