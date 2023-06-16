@@ -17,6 +17,9 @@ func NewAuthenticationService(encrypter models.IEncrypter, authenticationReposit
 
 func (as AuthenticationService) Login(username, password string) (*models.UserToken,error){
 	userFound := as.authenticationRepository.GetByUsername(username)
+	if userFound == nil {
+		return nil,errors.New("username or password is incorrect, try again")
+	}
 	if !as.encrypter.Compare([]byte(userFound.Password),[]byte(password)) {
 		return nil,errors.New("username or password is incorrect, try again")
 	}
