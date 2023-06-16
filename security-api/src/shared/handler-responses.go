@@ -11,3 +11,7 @@ func OK()*Response{
 func BadRequest(message string)*Response{
 	return &Response{Message: message}
 }
+
+func Unauthorized() *Response{
+	return &Response{Message: "Unauthorized access"}
+}

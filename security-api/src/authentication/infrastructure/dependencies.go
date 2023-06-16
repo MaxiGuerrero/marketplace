@@ -13,6 +13,6 @@ type Dependencies struct{
 
 func InitializeDependencies(db *mongo.DbConnector) *Dependencies{
 	return &Dependencies{
-		AuthenticationController: NewAuthenticationController(*service.NewAuthenticationService(encrpyter.CreateEncrypter(config.GetConfig().CostAlgorithmic),AuthenticationRepository{*db},JWTBuilder{})),
+		AuthenticationController: NewAuthenticationController(*service.NewAuthenticationService(encrpyter.CreateEncrypter(config.GetConfig().CostAlgorithmic),AuthenticationRepository{*db},&JWTBuilder{})),
 	}
 }

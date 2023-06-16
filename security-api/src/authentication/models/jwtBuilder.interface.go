@@ -8,6 +8,7 @@ import (
 
 type JWTBuilder interface {
 	BuildToken(payload *Payload) string
+	ValidateToken(tokenString string) (*Payload,error)
 }
 
 type Payload struct{

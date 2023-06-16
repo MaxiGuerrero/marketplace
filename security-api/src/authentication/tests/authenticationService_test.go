@@ -42,7 +42,12 @@ func (fj *FakeJwtBuilder) BuildToken(payload *models.Payload) string {
 	return args.String(0)
 }
 
-func TestLoginService(t *testing.T) {
+func (fj *FakeJwtBuilder) ValidateToken(token string) (*models.Payload,error) {
+	args := fj.Called(token)
+	return args.Get(0).(*models.Payload),args.Error(1)
+}
+
+func TestLogin(t *testing.T) {
 	fakeEncrypter := &FakeEncrypter{}
 	fakeRepository := &FakeAuthRepository{}
 	fakeJwtBuilder := &FakeJwtBuilder{}

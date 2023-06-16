@@ -1,11 +1,14 @@
 package infrastructure
 
 import (
+	"errors"
 	"log"
 	"marketplace/security-api/src/authentication/models"
 	config "marketplace/security-api/src/shared"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type JWTBuilder struct {}
@@ -23,4 +26,28 @@ func (j JWTBuilder) BuildToken(payload *models.Payload) string {
 		log.Panicf("Error to generate token: %v", err.Error())
 	}
 	return tokenString
+}
+
+func (j JWTBuilder) ValidateToken(tokenString string) (*models.Payload,error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return config.GetConfig().JWTSecret, nil
+	})
+	if err != nil {
+		return nil,err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok && !token.Valid {
+		return nil, errors.New("")
+	}
+	payload := &models.Payload{
+		UserId: claims["userId"].(primitive.ObjectID),
+		Username: claims["username"].(string),
+		CreatedAt: claims["createdAt"].(time.Time),
+		UpdatedAt: claims["updatedAt"].(time.Time),
+		DeletedAt: claims["deletedAt"].(time.Time),
+	}
+	return payload, nil
 }
