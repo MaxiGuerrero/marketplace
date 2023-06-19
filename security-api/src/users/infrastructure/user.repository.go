@@ -41,7 +41,22 @@ func (u UserRepository) GetByUsername(username string) *model.User{
 		if err == mongo.ErrNoDocuments {
 			return nil
 		}
-		log.Panicf("Error on database: %v",err.Error())
+		log.Panicf("Error on GetByUsername: %v",err.Error())
 	}
 	return userFound
+}
+//bson.D{primitive.E{Key: "email",Value: email},primitive.E{Key:"updatedat",Value: time.Now()}}
+func (u UserRepository) Update(username, newEmail string){
+	filter := bson.D{primitive.E{Key: "username", Value: username}}
+	update := bson.M{
+		"$set": bson.M{
+			"email": newEmail,
+			"updatedat": time.Now(),
+		},
+	}
+	_ , err := u.db.GetCollection("user").UpdateOne(ctx,filter,update)
+	if err != nil {
+		log.Panicf("Error on update user: %v", err)
+	}
+	log.Printf("User %v has been updated", username)
 }

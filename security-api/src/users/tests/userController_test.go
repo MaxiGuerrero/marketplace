@@ -21,6 +21,11 @@ func (u *FakeUserService) CreateUser(username,password,email string) error{
 	return args.Error(0)
 }
 
+func (u *FakeUserService) UpdateUser(username,email string) error{
+	args := u.Called(username,email)
+	return args.Error(0)
+}
+
 func TestUserController(t *testing.T){
 	app := fiber.New()
 	c := app.AcquireCtx(&fasthttp.RequestCtx{})

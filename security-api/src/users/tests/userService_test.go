@@ -25,6 +25,10 @@ func (ur *FakeUserRepository) GetByUsername(username string) *models.User{
 	return args.Get(0).(*models.User)
 }
 
+func (ur *FakeUserRepository) Update(username string, email string){
+	ur.Called(username,email)
+}
+
 type FakeEncrypter struct {
 	mock.Mock
 }

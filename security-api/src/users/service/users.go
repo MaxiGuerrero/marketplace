@@ -26,3 +26,12 @@ func (us UserService) CreateUser(username,password,email string) error{
 	us.userRepository.Create(username,string(hashedPassword),email)
 	return nil
 }
+
+func (us UserService) UpdateUser(username string, email string) error{
+	userFound := us.userRepository.GetByUsername(username)
+	if userFound == nil {
+		return errors.New("user does not exist")
+	}
+	us.userRepository.Update(username,email)
+	return nil
+}
