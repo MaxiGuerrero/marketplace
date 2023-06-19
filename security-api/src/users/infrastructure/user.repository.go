@@ -45,7 +45,7 @@ func (u UserRepository) GetByUsername(username string) *model.User{
 	}
 	return userFound
 }
-//bson.D{primitive.E{Key: "email",Value: email},primitive.E{Key:"updatedat",Value: time.Now()}}
+
 func (u UserRepository) Update(username, newEmail string){
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
 	update := bson.M{
