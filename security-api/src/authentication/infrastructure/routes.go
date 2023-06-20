@@ -6,5 +6,5 @@ import (
 
 
 func RegisterRoutes(router fiber.Router, ac AuthenticationController){
-	router.Post("/login",ac.login)
+	router.Post("/login",ac.Login)
 }

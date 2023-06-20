@@ -4,9 +4,11 @@ import (
 	models "marketplace/security-api/src/users/models"
 	s "marketplace/security-api/src/users/service"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type FakeUserRepository struct {
@@ -68,5 +70,37 @@ func TestUserCreate(t *testing.T) {
 		err := service.CreateUser(username,password,email)
 		// Assert
 		require.Error(t,err,"Username already exists")
+	})
+}
+
+func TestUserUpdate(t *testing.T) {
+	userFound := &models.User{
+		ID: primitive.NewObjectID(),
+		Username: "user",
+		Password: "password",
+		Email: "test@test.com",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	fakeRepo := &FakeUserRepository{}
+	fakeEncrpypter := &FakeEncrypter{}
+	service := s.NewUserService(fakeRepo, fakeEncrpypter)
+	t.Log("Update User")
+	t.Run("user updated sucessfully",func(t *testing.T) {
+		// Arrenge
+		fakeRepo.On("Update", userFound.Username, userFound.Email).Once()
+		fakeRepo.On("GetByUsername", userFound.Username).Return(userFound).Once()
+		// Act
+		err := service.UpdateUser(userFound.Username,userFound.Email)
+		// Assert
+		require.NoError(t,err,"Service does not return an error")
+	})
+	t.Run("user does not exists, return error",func(t *testing.T) {
+		// Arrenge
+		fakeRepo.On("GetByUsername", "userNotExists").Return(nil).Once()
+		// Act
+		err := service.UpdateUser("userNotExists","email@email.com")
+		// Assert
+		require.Error(t,err,"User does not exists")
 	})
 }

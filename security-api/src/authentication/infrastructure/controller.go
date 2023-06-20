@@ -21,7 +21,7 @@ func NewAuthenticationController(service models.IAuthenticationService) *Authent
 	}
 }
 
-func (ac AuthenticationController) login(c *fiber.Ctx) error{
+func (ac AuthenticationController) Login(c *fiber.Ctx) error{
 	req := models.LoginRequest{}
 	if parseError := c.BodyParser(&req); parseError!=nil{
 		return c.Status(400).JSON(response.BadRequest(parseError.Error()))
@@ -31,7 +31,7 @@ func (ac AuthenticationController) login(c *fiber.Ctx) error{
 	}
 	userToken,businessError := ac.service.Login(req.Username,req.Password)
 	if businessError != nil {
-		return c.Status(400).JSON(response.BadRequest(businessError.Error()))
+		return c.Status(401).JSON(response.BadRequest(businessError.Error()))
 	}
 	return c.Status(200).JSON(userToken)
 }
