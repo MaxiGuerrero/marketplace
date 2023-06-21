@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	responses "marketplace/security-api/src/shared"
+	"runtime"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -15,6 +16,9 @@ type Server struct {
 }
 
 func CreateServer(port int) *Server{
+    numGoroutines := runtime.NumCPU()
+	fmt.Println("Number of CPUs:", numGoroutines)
+	runtime.GOMAXPROCS(numGoroutines)
     app := fiber.New(fiber.Config{
         ErrorHandler: errorHandler,
     })
