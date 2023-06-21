@@ -15,6 +15,7 @@ type AuthenticationRepository struct{
 }
 
 func (ar AuthenticationRepository) GetByUsername(username string) *models.User {
+	log.Panicf("Test panic")
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
 	userFound := new(models.User)
 	err := ar.db.GetCollection("user").FindOne(ctx,filter).Decode(&userFound)

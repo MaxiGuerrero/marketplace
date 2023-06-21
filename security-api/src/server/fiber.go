@@ -3,8 +3,10 @@ package server
 import (
 	"fmt"
 	"log"
+	responses "marketplace/security-api/src/shared"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 type Server struct {
@@ -13,7 +15,11 @@ type Server struct {
 }
 
 func CreateServer(port int) *Server{
-    return &Server{Port: 8080, App: fiber.New()}
+    app := fiber.New(fiber.Config{
+        ErrorHandler: errorHandler,
+    })
+    app.Use(recover.New())
+    return &Server{Port: 8080, App: app}
 }
 
 func (server *Server) StartServer(){
@@ -28,4 +34,18 @@ func (server *Server) StopServer(){
     if error != nil {
         log.Fatalln("Error to stop server: ", error)
     }
+}
+
+func errorHandler(ctx *fiber.Ctx, err error) error {
+    // Status code defaults to 500
+    code := fiber.StatusInternalServerError
+
+    e := ctx.Status(code).JSON(responses.InternalError(err.Error()))
+
+    if e != nil {
+        return e
+    }
+
+    // Return from handler
+    return nil
 }

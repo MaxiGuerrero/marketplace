@@ -15,3 +15,7 @@ func BadRequest(message string)*Response{
 func Unauthorized() *Response{
 	return &Response{Message: "Unauthorized access"}
 }
+
+func InternalError(message string) *Response{
+	return &Response{Message: message}
+}
