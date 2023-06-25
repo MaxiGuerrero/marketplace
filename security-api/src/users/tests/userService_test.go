@@ -31,6 +31,10 @@ func (ur *FakeUserRepository) Update(username string, email string){
 	ur.Called(username,email)
 }
 
+func (ur *FakeUserRepository) Delete(username string){
+	ur.Called(username)
+}
+
 type FakeEncrypter struct {
 	mock.Mock
 }
@@ -100,6 +104,56 @@ func TestUserUpdate(t *testing.T) {
 		fakeRepo.On("GetByUsername", "userNotExists").Return(nil).Once()
 		// Act
 		err := service.UpdateUser("userNotExists","email@email.com")
+		// Assert
+		require.Error(t,err,"User does not exists")
+	})
+}
+
+func TestUserDelete(t *testing.T) {
+	userFound := &models.User{
+		ID: primitive.NewObjectID(),
+		Username: "user",
+		Password: "password",
+		Email: "test@test.com",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	fakeRepo := &FakeUserRepository{}
+	fakeEncrpypter := &FakeEncrypter{}
+	service := s.NewUserService(fakeRepo, fakeEncrpypter)
+	t.Log("Delete User")
+	t.Run("user deleted sucessfully",func(t *testing.T) {
+		// Arrenge
+		fakeRepo.On("Delete", userFound.Username).Once()
+		fakeRepo.On("GetByUsername", userFound.Username).Return(userFound).Once()
+		// Act
+		err := service.DeleteUser(userFound.Username)
+		// Assert
+		require.NoError(t,err,"Service does not return an error")
+	})
+	t.Run("user does not exists, return error",func(t *testing.T) {
+		// Arrenge
+		fakeRepo.On("GetByUsername", "userNotExists").Return(nil).Once()
+		// Act
+		err := service.DeleteUser("userNotExists")
+		// Assert
+		require.Error(t,err,"User does not exists")
+	})
+
+	t.Run("user has already deleted, return error",func(t *testing.T) {
+		// Arrenge
+		userFoundDeleted := &models.User{
+			ID: primitive.NewObjectID(),
+			Username: "user",
+			Password: "password",
+			Email: "test@test.com",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: time.Now(),
+		}
+		fakeRepo.On("GetByUsername", userFoundDeleted.Username).Return(userFoundDeleted).Once()
+		// Act
+		err := service.DeleteUser(userFoundDeleted.Username)
 		// Assert
 		require.Error(t,err,"User does not exists")
 	})

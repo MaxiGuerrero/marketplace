@@ -35,3 +35,15 @@ func (us UserService) UpdateUser(username string, email string) error{
 	us.userRepository.Update(username,email)
 	return nil
 }
+
+func (us UserService) DeleteUser(username string) error{
+	userFound := us.userRepository.GetByUsername(username)
+	if userFound == nil {
+		return errors.New("user does not exist")
+	}
+	if !userFound.DeletedAt.IsZero() {
+		return errors.New("user has already deleted")
+	}
+	us.userRepository.Delete(username)
+	return nil
+}

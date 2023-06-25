@@ -27,6 +27,11 @@ func (u *FakeUserService) UpdateUser(username,email string) error{
 	return args.Error(0)
 }
 
+func (u *FakeUserService) DeleteUser(username string) error{
+	args := u.Called(username)
+	return args.Error(0)
+}
+
 func TestCreateUser(t *testing.T){
 	app := fiber.New()
 	c := app.AcquireCtx(&fasthttp.RequestCtx{})
@@ -140,6 +145,52 @@ func TestUpdateUser(t *testing.T){
 		err := userController.UpdateUser(c)
 		// Assert
 		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t,400,c.Response().StatusCode())
+	})
+}
+
+func TestDeleteUser(t *testing.T){
+	app := fiber.New()
+	c := app.AcquireCtx(&fasthttp.RequestCtx{})
+	defer app.ReleaseCtx(c)
+	fakeServiceUser := &FakeUserService{}
+	userController := infrastructure.NewUserController(fakeServiceUser)
+	token := &jtoken.Token{
+		Claims: jtoken.MapClaims{
+			"username":"test",
+		},
+	}
+	t.Run("User deleted sucessfully, return 200",func(t *testing.T){
+		// Arrenge
+		fakeServiceUser.On("DeleteUser","test").Return(nil).Once()
+		c.Locals("user",token)
+		// Act
+		err := userController.DeleteUser(c)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t, `{"message":"operation sucessfully"}`, string(c.Response().Body()),"Must return status 200 with message")
+		utils.AssertEqual(t,200,c.Response().StatusCode())
+	})
+	t.Run("User does not exists, return 400",func(t *testing.T){
+		// Arrenge
+		fakeServiceUser.On("DeleteUser","test").Return(errors.New("user does not exist")).Once()
+		c.Locals("user",token)
+		// Act
+		err := userController.DeleteUser(c)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t, `{"message":"user does not exist"}`, string(c.Response().Body()),"Must return status 400 with message")
+		utils.AssertEqual(t,400,c.Response().StatusCode())
+	})
+	t.Run("User has already deleted, return 400",func(t *testing.T){
+		// Arrenge
+		fakeServiceUser.On("DeleteUser","test").Return(errors.New("user has already deleted")).Once()
+		c.Locals("user",token)
+		// Act
+		err := userController.DeleteUser(c)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t, `{"message":"user has already deleted"}`, string(c.Response().Body()),"Must return status 400 with message")
 		utils.AssertEqual(t,400,c.Response().StatusCode())
 	})
 }

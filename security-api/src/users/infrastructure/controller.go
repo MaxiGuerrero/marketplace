@@ -51,3 +51,14 @@ func (uc UserController) UpdateUser(c *fiber.Ctx) error{
 	}
 	return c.Status(200).JSON(response.OK())
 }
+
+func (uc UserController) DeleteUser(c *fiber.Ctx) error{
+	user := c.Locals("user").(*jtoken.Token)
+	claims := user.Claims.(jtoken.MapClaims)
+	username := claims["username"].(string)
+	businessErr := uc.service.DeleteUser(username)
+	if businessErr!=nil{
+		return c.Status(400).JSON(response.BadRequest(businessErr.Error()))
+	}
+	return c.Status(200).JSON(response.OK())
+}

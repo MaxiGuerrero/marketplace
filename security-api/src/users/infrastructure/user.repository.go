@@ -60,3 +60,7 @@ func (u UserRepository) Update(username, newEmail string){
 	}
 	log.Printf("User %v has been updated", username)
 }
+
+func (u UserRepository) Delete(username string){
+	
+}
