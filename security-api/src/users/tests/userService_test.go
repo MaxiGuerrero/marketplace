@@ -150,6 +150,7 @@ func TestUserDelete(t *testing.T) {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			DeletedAt: time.Now(),
+			Status: models.Inactive.String(),
 		}
 		fakeRepo.On("GetByUsername", userFoundDeleted.Username).Return(userFoundDeleted).Once()
 		// Act

@@ -62,5 +62,16 @@ func (u UserRepository) Update(username, newEmail string){
 }
 
 func (u UserRepository) Delete(username string){
-	
+	filter := bson.D{primitive.E{Key: "username", Value: username}}
+	update := bson.M{
+		"$set": bson.M{
+			"deletedat": time.Now(),
+			"status": model.Inactive.String(),
+		},
+	}
+	_ , err := u.db.GetCollection("user").UpdateOne(ctx,filter,update)
+	if err != nil {
+		log.Panicf("Error on delete user: %v", err)
+	}
+	log.Printf("User %v has been deleted", username)
 }

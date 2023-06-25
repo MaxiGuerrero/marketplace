@@ -32,6 +32,9 @@ func (us UserService) UpdateUser(username string, email string) error{
 	if userFound == nil {
 		return errors.New("user does not exist")
 	}
+	if userFound.Status == models.Inactive.String() {
+		return errors.New("user does not exist")
+	}
 	us.userRepository.Update(username,email)
 	return nil
 }
@@ -41,7 +44,7 @@ func (us UserService) DeleteUser(username string) error{
 	if userFound == nil {
 		return errors.New("user does not exist")
 	}
-	if !userFound.DeletedAt.IsZero() {
+	if userFound.Status == models.Inactive.String() {
 		return errors.New("user has already deleted")
 	}
 	us.userRepository.Delete(username)

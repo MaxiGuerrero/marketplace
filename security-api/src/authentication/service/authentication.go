@@ -20,6 +20,9 @@ func (as AuthenticationService) Login(username, password string) (*models.UserTo
 	if userFound == nil {
 		return nil,errors.New("username or password is incorrect, try again")
 	}
+	if userFound.Status == models.Inactive.String() {
+		return nil,errors.New("username or password is incorrect, try again")
+	}
 	if !as.encrypter.Compare([]byte(userFound.Password),[]byte(password)) {
 		return nil,errors.New("username or password is incorrect, try again")
 	}
