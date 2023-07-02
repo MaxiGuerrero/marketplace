@@ -47,7 +47,7 @@ func TestCreateUser(t *testing.T){
 		err := userController.CreateUser(c)
 		// Assert
 		require.NoError(t,err,"Controller does not return an error")
-		utils.AssertEqual(t, `{"message":"operation sucessfully"}`, string(c.Response().Body()),"Must return status 200 with message")
+		utils.AssertEqual(t, `{"message":"Successful operation"}`, string(c.Response().Body()),"Must return status 200 with message")
 		utils.AssertEqual(t,200,c.Response().StatusCode())
 	})
 	t.Run("User already exists, return 400",func(t *testing.T){
@@ -107,7 +107,7 @@ func TestUpdateUser(t *testing.T){
 		err := userController.UpdateUser(c)
 		// Assert
 		require.NoError(t,err,"Controller does not return an error")
-		utils.AssertEqual(t, `{"message":"operation sucessfully"}`, string(c.Response().Body()),"Must return status 200 with message")
+		utils.AssertEqual(t, `{"message":"Successful operation"}`, string(c.Response().Body()),"Must return status 200 with message")
 		utils.AssertEqual(t,200,c.Response().StatusCode())
 	})
 		t.Run("User does not exists, return 400",func(t *testing.T){
@@ -168,7 +168,7 @@ func TestDeleteUser(t *testing.T){
 		err := userController.DeleteUser(c)
 		// Assert
 		require.NoError(t,err,"Controller does not return an error")
-		utils.AssertEqual(t, `{"message":"operation sucessfully"}`, string(c.Response().Body()),"Must return status 200 with message")
+		utils.AssertEqual(t, `{"message":"Successful operation"}`, string(c.Response().Body()),"Must return status 200 with message")
 		utils.AssertEqual(t,200,c.Response().StatusCode())
 	})
 	t.Run("User does not exists, return 400",func(t *testing.T){

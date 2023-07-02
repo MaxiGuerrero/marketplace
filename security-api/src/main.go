@@ -16,7 +16,7 @@ func main(){
 	authDependencies := authentication.InitializeDependencies(connector)
 	usersDependencies := users.InitializeDependencies(connector)
 	// Create server
-	server := s.CreateServer(8080)
+	server := s.CreateServer(config.GetConfig().Port,true)
 	// Register Routes
 	authentication.RegisterRoutes(server.App,*authDependencies.AuthenticationController)
 	users.RegisterRoutes(server.App,*usersDependencies.UserController)

@@ -5,7 +5,7 @@ type Response struct{
 }
 
 func OK()*Response{
-	return &Response{Message: "operation sucessfully"}
+	return &Response{Message: "Successful operation"}
 }
 
 func BadRequest(message string)*Response{

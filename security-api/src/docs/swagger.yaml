@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  termsOfService: "http://swagger.io/terms/"
+  title: Security-API
+  license:
+    name: ISC
+servers:
+  - url: https://api.example.com/v1
+    description: Default
+paths:
+  "/login":
+    post:
+      tags:
+        - Login
+      summary: User's login
+      description: User login into system.
+      operationId: login
+      requestBody:
+        $ref: "#/components/requestBodies/LoginRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/LoginResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  "/register":
+    post:
+      tags:
+        - User
+      summary: User's register
+      description: User register in the system.
+      operationId: register
+      requestBody:
+        $ref: "#/components/requestBodies/RegisterRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  "/users":
+    put:
+      tags:
+        - User
+      summary: User update email
+      description: User can update it email.
+      operationId: updateUser
+      requestBody:
+        $ref: "#/components/requestBodies/UpdateUsersRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags:
+        - User
+      summary: User delete account
+      description: User can delete it account.
+      operationId: deleteUser
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    Success:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StandardResponse"
+    Unauthorized:
+      description: Access token is missing or is invalid
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalServerError:
+      description: Internal server error
+    LoginResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TokenSchema"
+  requestBodies:
+    LoginRequest:
+      description: "Login request schema"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginSchema"
+    RegisterRequest:
+      description: "Register request schema"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RequestSchema"
+    UpdateUsersRequest:
+      description: "Update user request schema"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UpdateUserSchema"
+  schemas:
+    StandardResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Successful operation
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Invalid username y/o password"
+    LoginSchema:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "Username"
+        password:
+          type: string
+          example: "Password"
+    RequestSchema:
+      type: object
+      properties:
+        username:
+          type: string
+          example: username
+        password:
+          type: string
+          example: password
+        email:
+          type: string
+          format: email
+          example: test@test.com
+    TokenSchema:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 1
+        token:
+          type: string
+          example: token-jwt
+    UpdateUserSchema:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: test@test.com
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: Page number
+      schema:
+        type: number
+        default: 1
+    page_size:
+      name: page_size
+      in: query
+      description: Limit the number of results
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    sort:
+      name: sort
+      in: query
+      description: Attribute to sort by
+      schema:
+        type: string
+    sort_dir:
+      name: sort_dir
+      in: query
+      description: Sorting direction
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
