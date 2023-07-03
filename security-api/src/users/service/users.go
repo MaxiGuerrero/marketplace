@@ -50,3 +50,7 @@ func (us UserService) DeleteUser(username string) error{
 	us.userRepository.Delete(username)
 	return nil
 }
+
+func (us UserService) GetUsers() *models.Users {
+	return us.userRepository.Get()
+}

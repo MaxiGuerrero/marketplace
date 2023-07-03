@@ -12,5 +12,6 @@ func RegisterRoutes(router fiber.Router, uc UserController){
 	router.Post("/register",uc.CreateUser)
 	router.Put("/users",jwt,uc.UpdateUser)
 	router.Delete("/users",jwt,uc.DeleteUser)
+	router.Get("/users",jwt,uc.GetUsers)
 }
 

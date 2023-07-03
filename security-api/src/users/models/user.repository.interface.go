@@ -4,6 +4,6 @@ type IUserRepository interface {
 	Create(username,password,email string)
 	Update(username, email string)
 	Delete(usernae string)
-	// GetById() *User
+	Get() *Users
 	GetByUsername(username string) *User
 }

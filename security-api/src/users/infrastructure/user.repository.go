@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	database "marketplace/security-api/src/shared/database"
-	model "marketplace/security-api/src/users/models"
+	models "marketplace/security-api/src/users/models"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,11 +19,11 @@ type UserRepository struct{
 }
 
 func (u UserRepository) Create(username,password,email string){
-	_,err := u.db.GetCollection("user").InsertOne(ctx,model.User{
+	_,err := u.db.GetCollection("user").InsertOne(ctx,models.User{
 		Username: username,
 		Password: password,
 		Email: email,
-		Status: model.Status.String(model.Active),
+		Status: models.Status.String(models.Active),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
@@ -33,9 +33,9 @@ func (u UserRepository) Create(username,password,email string){
 	log.Printf("User %v has been created",username)
 }
 
-func (u UserRepository) GetByUsername(username string) *model.User{
+func (u UserRepository) GetByUsername(username string) *models.User{
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
-	userFound := new(model.User)
+	userFound := new(models.User)
 	err := u.db.GetCollection("user").FindOne(ctx,filter).Decode(&userFound)
 	if err != nil { 
 		if err == mongo.ErrNoDocuments {
@@ -66,7 +66,7 @@ func (u UserRepository) Delete(username string){
 	update := bson.M{
 		"$set": bson.M{
 			"deletedat": time.Now(),
-			"status": model.Inactive.String(),
+			"status": models.Inactive.String(),
 		},
 	}
 	_ , err := u.db.GetCollection("user").UpdateOne(ctx,filter,update)
@@ -74,4 +74,16 @@ func (u UserRepository) Delete(username string){
 		log.Panicf("Error on delete user: %v", err)
 	}
 	log.Printf("User %v has been deleted", username)
+}
+
+func (u UserRepository) Get() *models.Users{
+	var users models.Users
+	cursor , err := u.db.GetCollection("user").Find(ctx,bson.D{})
+	if err != nil {
+		log.Panicf("Error on get users: %v", err)
+	}
+	if err = cursor.All(ctx,&users); err != nil {
+		log.Panicf("Error on get users: %v", err)
+	}
+	return &users
 }

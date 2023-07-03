@@ -1,9 +1,12 @@
 package tests
 
 import (
+	"encoding/json"
 	"errors"
 	infrastructure "marketplace/security-api/src/users/infrastructure"
+	models "marketplace/security-api/src/users/models"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -11,6 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/valyala/fasthttp"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type FakeUserService struct {
@@ -30,6 +34,11 @@ func (u *FakeUserService) UpdateUser(username,email string) error{
 func (u *FakeUserService) DeleteUser(username string) error{
 	args := u.Called(username)
 	return args.Error(0)
+}
+
+func (u *FakeUserService) GetUsers() *models.Users {
+	args := u.Called()
+	return args.Get(0).(*models.Users)
 }
 
 func TestCreateUser(t *testing.T){
@@ -192,5 +201,48 @@ func TestDeleteUser(t *testing.T){
 		require.NoError(t,err,"Controller does not return an error")
 		utils.AssertEqual(t, `{"message":"user has already deleted"}`, string(c.Response().Body()),"Must return status 400 with message")
 		utils.AssertEqual(t,400,c.Response().StatusCode())
+	})
+}
+
+func TestGetUsersC(t *testing.T){
+	app := fiber.New()
+	c := app.AcquireCtx(&fasthttp.RequestCtx{})
+	defer app.ReleaseCtx(c)
+	fakeServiceUser := &FakeUserService{}
+	userController := infrastructure.NewUserController(fakeServiceUser)
+	token := &jtoken.Token{
+		Claims: jtoken.MapClaims{
+			"username":"test",
+		},
+	}
+	t.Run("Get list of user successfully, return 200",func(t *testing.T){
+		// Arrenge
+		c.Locals("user",token)
+		usersExpected := &models.Users{
+			{	
+				ID: primitive.NewObjectID(),
+				Username: "user1",
+				Password: "password1",
+				Email: "test1@test.com",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+			{
+				ID: primitive.NewObjectID(),
+				Username: "user2",
+				Password: "password2",
+				Email: "test2@test.com",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+		}
+		fakeServiceUser.On("GetUsers").Return(usersExpected).Once()
+		// Act
+		err := userController.GetUsers(c)
+		usersJson, _ := json.Marshal(usersExpected)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t,200,c.Response().StatusCode())
+		utils.AssertEqual(t, string(usersJson), string(c.Response().Body()),"Must return list of users found with status 200")
 	})
 }

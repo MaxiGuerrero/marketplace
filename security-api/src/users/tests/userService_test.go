@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -33,6 +34,11 @@ func (ur *FakeUserRepository) Update(username string, email string){
 
 func (ur *FakeUserRepository) Delete(username string){
 	ur.Called(username)
+}
+
+func (ur *FakeUserRepository) Get() *models.Users{
+	args := ur.Called()
+	return args.Get(0).(*models.Users)
 }
 
 type FakeEncrypter struct {
@@ -157,5 +163,38 @@ func TestUserDelete(t *testing.T) {
 		err := service.DeleteUser(userFoundDeleted.Username)
 		// Assert
 		require.Error(t,err,"User does not exists")
+	})
+}
+
+func TestGetUsers(t *testing.T) {
+	fakeRepo := &FakeUserRepository{}
+	fakeEncrpypter := &FakeEncrypter{}
+	service := s.NewUserService(fakeRepo, fakeEncrpypter)
+	t.Log("Get Users")
+	t.Run("Get list of users found",func(t *testing.T) {
+		// Arrenge
+		usersExpected := &models.Users{
+			{	
+				ID: primitive.NewObjectID(),
+				Username: "user1",
+				Password: "password1",
+				Email: "test1@test.com",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+			{
+				ID: primitive.NewObjectID(),
+				Username: "user2",
+				Password: "password2",
+				Email: "test2@test.com",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+		}
+		fakeRepo.On("Get").Return(usersExpected).Once()
+		// Act
+		users := service.GetUsers()
+		// Assert
+		assert.Equal(t, usersExpected, users, "Get list of users must")
 	})
 }

@@ -62,3 +62,7 @@ func (uc UserController) DeleteUser(c *fiber.Ctx) error{
 	}
 	return c.Status(200).JSON(response.OK())
 }
+
+func (uc UserController) GetUsers(c *fiber.Ctx) error{
+	return c.Status(200).JSON(uc.service.GetUsers())
+}
