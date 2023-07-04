@@ -27,7 +27,7 @@ func (uc UserController) CreateUser(c *fiber.Ctx) error{
 	if badSchema := utils.ValidateSchema(&req); badSchema != nil{
 		return c.Status(400).JSON(response.BadRequest(badSchema.Error()))
 	}
-	businessErr := uc.service.CreateUser(req.Username,req.Password,req.Email)
+	businessErr := uc.service.CreateUser(req.Username,req.Password,req.Email,req.Role)
 	if businessErr!=nil{
 		return c.Status(400).JSON(response.BadRequest(businessErr.Error()))
 	}
@@ -64,5 +64,11 @@ func (uc UserController) DeleteUser(c *fiber.Ctx) error{
 }
 
 func (uc UserController) GetUsers(c *fiber.Ctx) error{
+	user := c.Locals("user").(*jtoken.Token)
+	claims := user.Claims.(jtoken.MapClaims)
+	role := claims["role"].(string)
+	if role != models.ADMIN.String() {
+		return c.Status(401).JSON(response.Unauthorized())
+	}
 	return c.Status(200).JSON(uc.service.GetUsers())
 }

@@ -18,6 +18,17 @@ func (s Status) String() string{
 	return []string{"Active","Blocked","Inactive"}[s]
 }
 
+type Role int8
+
+const (
+	ADMIN Role = iota
+	USER
+)
+
+func (s Role) String() string{
+	return []string{"ADMIN","USER"}[s]
+}
+
 type User struct {
 	ID primitive.ObjectID 	`bson:"_id,omitempty"`
 	Username string 		`json:"username"`
@@ -27,6 +38,7 @@ type User struct {
 	CreatedAt time.Time		`json:"created_at"`
 	UpdatedAt time.Time		`json:"updated_at,omitempty"`
 	DeletedAt time.Time     `json:"deleted_at" bson:"deleted_at,omitempty"`
+	Role string				`json:"role"`
 }
 
 type Users []User

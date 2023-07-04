@@ -1,8 +1,10 @@
 package tests
 
 import (
+	"marketplace/security-api/src/shared/utils"
 	models "marketplace/security-api/src/users/models"
 	s "marketplace/security-api/src/users/service"
+	"os"
 	"testing"
 	"time"
 
@@ -12,12 +14,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+func TestMain(m *testing.M) {
+	utils.RegisterValidation()
+	os.Exit(m.Run())
+}
+
 type FakeUserRepository struct {
 	mock.Mock
 }
 
-func (ur *FakeUserRepository) Create(username,password,email string){
-	ur.Called(username,password,email)
+func (ur *FakeUserRepository) Create(username,password,email,role string){
+	ur.Called(username,password,email,role)
 }
 
 func (ur *FakeUserRepository) GetByUsername(username string) *models.User{
@@ -56,7 +63,7 @@ func (encrypter *FakeEncrypter) Compare(hashedPassword, password []byte) bool{
 }
 
 func TestUserCreate(t *testing.T) {
-	const username,password,email = "user","password","test@test.com"
+	const username,password,email,role = "user","password","test@test.com","USER"
 	passwordEncrypted := []byte(password)
 	fakeRepo := &FakeUserRepository{}
 	fakeEncrpypter := &FakeEncrypter{}
@@ -65,10 +72,10 @@ func TestUserCreate(t *testing.T) {
 	t.Run("user created sucessfully",func(t *testing.T) {
 		// Arrenge
 		fakeEncrpypter.On("GenerateHash",[]byte(password)).Return(passwordEncrypted).Once()
-		fakeRepo.On("Create", username, string(passwordEncrypted), email).Once()
+		fakeRepo.On("Create", username, string(passwordEncrypted), email,role).Once()
 		fakeRepo.On("GetByUsername", username).Return(nil).Once()
 		// Act
-		err := service.CreateUser(username,password,email)
+		err := service.CreateUser(username,password,email,role)
 		// Assert
 		require.NoError(t,err,"Service does not return an error")
 	})
@@ -77,7 +84,7 @@ func TestUserCreate(t *testing.T) {
 		userFound := new(models.User)
 		fakeRepo.On("GetByUsername", username).Return(userFound).Once()
 		// Act
-		err := service.CreateUser(username,password,email)
+		err := service.CreateUser(username,password,email,role)
 		// Assert
 		require.Error(t,err,"Username already exists")
 	})
@@ -91,6 +98,8 @@ func TestUserUpdate(t *testing.T) {
 		Email: "test@test.com",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		Status: models.Active.String(),
+		Role: models.USER.String(),
 	}
 	fakeRepo := &FakeUserRepository{}
 	fakeEncrpypter := &FakeEncrypter{}
@@ -123,6 +132,8 @@ func TestUserDelete(t *testing.T) {
 		Email: "test@test.com",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		Status: models.Active.String(),
+		Role: models.USER.String(),
 	}
 	fakeRepo := &FakeUserRepository{}
 	fakeEncrpypter := &FakeEncrypter{}
@@ -157,6 +168,7 @@ func TestUserDelete(t *testing.T) {
 			UpdatedAt: time.Now(),
 			DeletedAt: time.Now(),
 			Status: models.Inactive.String(),
+			Role: models.USER.String(),
 		}
 		fakeRepo.On("GetByUsername", userFoundDeleted.Username).Return(userFoundDeleted).Once()
 		// Act
@@ -181,6 +193,8 @@ func TestGetUsers(t *testing.T) {
 				Email: "test1@test.com",
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
+				Role: models.USER.String(),
+				Status: models.Active.String(),
 			},
 			{
 				ID: primitive.NewObjectID(),
@@ -189,6 +203,8 @@ func TestGetUsers(t *testing.T) {
 				Email: "test2@test.com",
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
+				Role: models.USER.String(),
+				Status: models.Active.String(),
 			},
 		}
 		fakeRepo.On("Get").Return(usersExpected).Once()

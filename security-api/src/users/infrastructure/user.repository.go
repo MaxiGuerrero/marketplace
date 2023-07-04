@@ -18,7 +18,7 @@ type UserRepository struct{
 	db database.DbConnector
 }
 
-func (u UserRepository) Create(username,password,email string){
+func (u UserRepository) Create(username,password,email,role string){
 	_,err := u.db.GetCollection("user").InsertOne(ctx,models.User{
 		Username: username,
 		Password: password,
@@ -26,6 +26,7 @@ func (u UserRepository) Create(username,password,email string){
 		Status: models.Status.String(models.Active),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		Role: role,
 	})
 	if err != nil{
 		log.Panicf("Error on create user document: %v",err.Error())

@@ -32,6 +32,7 @@ func (as AuthenticationService) Login(username, password string) (*models.UserTo
 		CreatedAt: userFound.CreatedAt,
 		UpdatedAt: userFound.UpdatedAt,
 		DeletedAt: userFound.DeletedAt,
+		Role: userFound.Role,
 	})
 	return &models.UserToken{UserId: userFound.ID,Token: token},nil
 }

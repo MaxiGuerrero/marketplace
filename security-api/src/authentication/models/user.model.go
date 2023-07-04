@@ -27,6 +27,7 @@ type User struct {
 	CreatedAt time.Time		`json:"created_at"`
 	UpdatedAt time.Time		`json:"updated_at,omitempty"`
 	DeletedAt time.Time     `json:"deleted_at" bson:"deleted_at,omitempty"`
+	Role string				`json:"role"`
 }
 
 type Users []User

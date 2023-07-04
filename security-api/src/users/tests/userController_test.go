@@ -21,8 +21,8 @@ type FakeUserService struct {
 	mock.Mock
 }
 
-func (u *FakeUserService) CreateUser(username,password,email string) error{
-	args := u.Called(username,password,email)
+func (u *FakeUserService) CreateUser(username,password,email,role string) error{
+	args := u.Called(username,password,email,role)
 	return args.Error(0)
 }
 
@@ -49,9 +49,9 @@ func TestCreateUser(t *testing.T){
 	userController := infrastructure.NewUserController(fakeServiceUser)
 	t.Run("User created sucessfully, return 200",func(t *testing.T){
 		// Arrenge
-		fakeServiceUser.On("CreateUser","test","test","test@gmail.com").Return(nil).Once()
+		fakeServiceUser.On("CreateUser","test","test","test@gmail.com","USER").Return(nil).Once()
 		c.Request().Header.SetContentType("application/json")
-        c.Request().SetBody([]byte(`{"username":"test","password":"test","email":"test@gmail.com"}`))
+        c.Request().SetBody([]byte(`{"username":"test","password":"test","email":"test@gmail.com","role":"USER"}`))
 		// Act
 		err := userController.CreateUser(c)
 		// Assert
@@ -61,9 +61,9 @@ func TestCreateUser(t *testing.T){
 	})
 	t.Run("User already exists, return 400",func(t *testing.T){
 		// Arrenge
-		fakeServiceUser.On("CreateUser","test","test","test@gmail.com").Return(errors.New("username already exists, please use another")).Once()
+		fakeServiceUser.On("CreateUser","test","test","test@gmail.com","USER").Return(errors.New("username already exists, please use another")).Once()
 		c.Request().Header.SetContentType("application/json")
-        c.Request().SetBody([]byte(`{"username":"test","password":"test","email":"test@gmail.com"}`))
+        c.Request().SetBody([]byte(`{"username":"test","password":"test","email":"test@gmail.com","role":"USER"}`))
 		// Act
 		err := userController.CreateUser(c)
 		// Assert
@@ -104,6 +104,7 @@ func TestUpdateUser(t *testing.T){
 	token := &jtoken.Token{
 		Claims: jtoken.MapClaims{
 			"username":"test",
+			"role":"USER",
 		},
 	}
 	t.Run("User updated sucessfully, return 200",func(t *testing.T){
@@ -167,6 +168,7 @@ func TestDeleteUser(t *testing.T){
 	token := &jtoken.Token{
 		Claims: jtoken.MapClaims{
 			"username":"test",
+			"role":"USER",
 		},
 	}
 	t.Run("User deleted sucessfully, return 200",func(t *testing.T){
@@ -210,13 +212,14 @@ func TestGetUsersC(t *testing.T){
 	defer app.ReleaseCtx(c)
 	fakeServiceUser := &FakeUserService{}
 	userController := infrastructure.NewUserController(fakeServiceUser)
-	token := &jtoken.Token{
-		Claims: jtoken.MapClaims{
-			"username":"test",
-		},
-	}
 	t.Run("Get list of user successfully, return 200",func(t *testing.T){
 		// Arrenge
+		token := &jtoken.Token{
+			Claims: jtoken.MapClaims{
+				"username":"test",
+				"role":"ADMIN",
+			},
+		}
 		c.Locals("user",token)
 		usersExpected := &models.Users{
 			{	
@@ -226,6 +229,8 @@ func TestGetUsersC(t *testing.T){
 				Email: "test1@test.com",
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
+				Role: models.USER.String(),
+				Status: models.Active.String(),
 			},
 			{
 				ID: primitive.NewObjectID(),
@@ -234,6 +239,8 @@ func TestGetUsersC(t *testing.T){
 				Email: "test2@test.com",
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
+				Role: models.USER.String(),
+				Status: models.Active.String(),
 			},
 		}
 		fakeServiceUser.On("GetUsers").Return(usersExpected).Once()
@@ -244,5 +251,22 @@ func TestGetUsersC(t *testing.T){
 		require.NoError(t,err,"Controller does not return an error")
 		utils.AssertEqual(t,200,c.Response().StatusCode())
 		utils.AssertEqual(t, string(usersJson), string(c.Response().Body()),"Must return list of users found with status 200")
+	})
+
+	t.Run("User not admin trying to get list of users, return 401 unauthorized",func(t *testing.T){
+		// Arrenge
+		token := &jtoken.Token{
+			Claims: jtoken.MapClaims{
+				"username":"test",
+				"role":"USER",
+			},
+		}
+		c.Locals("user",token)
+		// Act
+		err := userController.GetUsers(c)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t,401,c.Response().StatusCode())
+		utils.AssertEqual(t,`{"message":"Unauthorized access"}`, string(c.Response().Body()),"Must return message unauthorized with status 401")
 	})
 }

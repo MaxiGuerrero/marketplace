@@ -17,13 +17,13 @@ func NewUserService(userRepository models.IUserRepository, encrypter models.IEnc
 	}
 }
 
-func (us UserService) CreateUser(username,password,email string) error{
+func (us UserService) CreateUser(username,password,email,role string) error{
 	userFound := us.userRepository.GetByUsername(username)
 	if userFound != nil {
 		return errors.New("username already exists, please use another")
 	}
 	hashedPassword := us.encrypter.GenerateHash([]byte(password))
-	us.userRepository.Create(username,string(hashedPassword),email)
+	us.userRepository.Create(username,string(hashedPassword),email,role)
 	return nil
 }
 

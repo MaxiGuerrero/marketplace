@@ -20,6 +20,7 @@ func (j JWTBuilder) BuildToken(payload *models.Payload) string {
 		"createdAt": payload.CreatedAt,
 		"updatedAt": payload.UpdatedAt,
 		"deletedAt": payload.DeletedAt,
+		"role": payload.Role,
 	})
 	tokenString, err := token.SignedString(config.GetConfig().JWTSecret)
 	if err != nil {
@@ -48,6 +49,7 @@ func (j JWTBuilder) ValidateToken(tokenString string) (*models.Payload,error) {
 		CreatedAt: claims["createdAt"].(time.Time),
 		UpdatedAt: claims["updatedAt"].(time.Time),
 		DeletedAt: claims["deletedAt"].(time.Time),
+		Role: claims["role"].(string),
 	}
 	return payload, nil
 }

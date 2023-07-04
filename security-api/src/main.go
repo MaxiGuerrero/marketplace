@@ -6,6 +6,7 @@ import (
 	s "marketplace/security-api/src/server"
 	config "marketplace/security-api/src/shared"
 	mongo "marketplace/security-api/src/shared/database"
+	utils "marketplace/security-api/src/shared/utils"
 	users "marketplace/security-api/src/users/infrastructure"
 )
 
@@ -20,6 +21,8 @@ func main(){
 	// Register Routes
 	authentication.RegisterRoutes(server.App,*authDependencies.AuthenticationController)
 	users.RegisterRoutes(server.App,*usersDependencies.UserController)
+	// Register custom validation
+	utils.RegisterValidation()
 	// Start Server
 	server.StartServer()
 }
