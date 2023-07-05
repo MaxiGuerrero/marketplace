@@ -5,7 +5,8 @@ import (
 	"log"
 	docs "marketplace/security-api/src/docs"
 	responses "marketplace/security-api/src/shared"
-	"runtime"
+	"syscall"
+	"unsafe"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -18,12 +19,24 @@ type Server struct {
 }
 
 func CreateServer(port int,activateDocs bool) *Server{
-    numGoroutines := runtime.NumCPU()
-	fmt.Println("Number of CPUs:", numGoroutines)
-	runtime.GOMAXPROCS(numGoroutines)
+	var mask uintptr
+	
+	// Get the current CPU affinity of the process
+	if _, _, err := syscall.RawSyscall(syscall.SYS_SCHED_GETAFFINITY, 0, uintptr(unsafe.Sizeof(mask)), uintptr(unsafe.Pointer(&mask))); err != 0 {
+        panic("Failed to get CPU affinity:")
+	}
+	fmt.Println("Current CPU affinity:", mask)
+
+	// Set the new CPU affinity
+	mask = 24
+	if _, _, err := syscall.RawSyscall(syscall.SYS_SCHED_SETAFFINITY, 0, uintptr(unsafe.Sizeof(mask)), uintptr(unsafe.Pointer(&mask))); err != 0 {
+        panic("Failed to set CPU affinity:")
+	}
+	fmt.Println("New CPU affinity:", mask)
     app := fiber.New(fiber.Config{
         ErrorHandler: errorHandler,
     })
+    app.Use(Logrequest)
     if(activateDocs){
         doc := docs.LoadDoc()
         app.Get("/docs/*", swagger.New(swagger.Config{
@@ -55,13 +68,17 @@ func (server *Server) StopServer(){
 func errorHandler(ctx *fiber.Ctx, err error) error {
     // Status code defaults to 500
     code := fiber.StatusInternalServerError
-
     e := ctx.Status(code).JSON(responses.InternalError(err.Error()))
-
     if e != nil {
         return e
     }
-
     // Return from handler
     return nil
+}
+
+func Logrequest(c *fiber.Ctx) error {
+    log.Printf("Starting request: %v",c.Context().ID())
+    err := c.Next()
+    log.Printf("Request completed: %v",c.Context().ID())
+    return err
 }

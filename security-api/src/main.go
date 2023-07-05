@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	authentication "marketplace/security-api/src/authentication/infrastructure"
+	"marketplace/security-api/src/healthcheck"
 	s "marketplace/security-api/src/server"
 	config "marketplace/security-api/src/shared"
 	mongo "marketplace/security-api/src/shared/database"
@@ -21,6 +22,7 @@ func main(){
 	// Register Routes
 	authentication.RegisterRoutes(server.App,*authDependencies.AuthenticationController)
 	users.RegisterRoutes(server.App,*usersDependencies.UserController)
+	healthcheck.RegisterRoutes(server.App)
 	// Register custom validation
 	utils.RegisterValidation()
 	// Start Server
