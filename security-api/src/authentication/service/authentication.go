@@ -5,16 +5,20 @@ import (
 	"marketplace/security-api/src/authentication/models"
 )
 
+// AuthenticationService is a service that is responsable to manage the authentication user in the system.
+// All service manage the business logical.
 type AuthenticationService struct{
 	encrypter models.IEncrypter
 	authenticationRepository models.IAuthenticationRepository
 	jwtBuilder models.JWTBuilder
 }
 
+// Create an instance of the AuthenticationService with injection dependencies
 func NewAuthenticationService(encrypter models.IEncrypter, authenticationRepository models.IAuthenticationRepository, jwtBuilder models.JWTBuilder) *AuthenticationService{
 	return &AuthenticationService{encrypter, authenticationRepository, jwtBuilder}
 }
 
+// Implementation about login a user in the system.
 func (as AuthenticationService) Login(username, password string) (*models.UserToken,error){
 	userFound := as.authenticationRepository.GetByUsername(username)
 	if userFound == nil {

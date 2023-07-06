@@ -14,6 +14,7 @@ const (
 	Inactive
 )
 
+// Method to get the string of the status type.
 func (s Status) String() string{
 	return []string{"Active","Blocked","Inactive"}[s]
 }

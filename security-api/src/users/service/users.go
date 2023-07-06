@@ -3,13 +3,16 @@ package service
 import (
 	"errors"
 	models "marketplace/security-api/src/users/models"
-) 
+)
 
+// Userservice is a service that is responsable to manage users in the system.
+// All service manage the business logical.
 type UserService struct{
 	userRepository models.IUserRepository
 	encrypter models.IEncrypter
 }
 
+// Create an instance of the UserService with injection dependencies.
 func NewUserService(userRepository models.IUserRepository, encrypter models.IEncrypter) *UserService{
 	return &UserService{
 		userRepository,
@@ -17,6 +20,7 @@ func NewUserService(userRepository models.IUserRepository, encrypter models.IEnc
 	}
 }
 
+//  Create an user in the system, is possible return an business error if exists the user with the same username.
 func (us UserService) CreateUser(username,password,email,role string) error{
 	userFound := us.userRepository.GetByUsername(username)
 	if userFound != nil {
@@ -27,6 +31,8 @@ func (us UserService) CreateUser(username,password,email,role string) error{
 	return nil
 }
 
+// Update an user in the system, an user can update its email. 
+// Is possible return an business error if the user doesn't exists.
 func (us UserService) UpdateUser(username string, email string) error{
 	userFound := us.userRepository.GetByUsername(username)
 	if userFound == nil {
@@ -39,6 +45,8 @@ func (us UserService) UpdateUser(username string, email string) error{
 	return nil
 }
 
+// Delete an user in the system, is a logical delete.
+// Is possible return an business error if the user doesn't exists.
 func (us UserService) DeleteUser(username string) error{
 	userFound := us.userRepository.GetByUsername(username)
 	if userFound == nil {
@@ -51,6 +59,7 @@ func (us UserService) DeleteUser(username string) error{
 	return nil
 }
 
+// Get an array of users in the system.
 func (us UserService) GetUsers() *models.Users {
 	return us.userRepository.Get()
 }

@@ -13,11 +13,14 @@ import (
 	"github.com/gofiber/swagger"
 )
 
+// Responsable to implement the API server logical to start or stop the server.
+// This server implement the library "Fiber".
 type Server struct {
 	Port int
     App *fiber.App
 }
 
+// Create a instance of the server setting the port and if the swagger doc must be expose.
 func CreateServer(port int,activateDocs bool) *Server{
 	var mask uintptr
 	
@@ -36,7 +39,7 @@ func CreateServer(port int,activateDocs bool) *Server{
     app := fiber.New(fiber.Config{
         ErrorHandler: errorHandler,
     })
-    app.Use(Logrequest)
+    app.Use(LogRequest)
     if(activateDocs){
         doc := docs.LoadDoc()
         app.Get("/docs/*", swagger.New(swagger.Config{
@@ -51,6 +54,7 @@ func CreateServer(port int,activateDocs bool) *Server{
     return &Server{Port: 8080, App: app}
 }
 
+// Run server on port configurated.
 func (server *Server) StartServer(){
     var error = server.App.Listen(fmt.Sprintf(":%v", server.Port))
     if error != nil {
@@ -58,6 +62,7 @@ func (server *Server) StartServer(){
     }
 }
 
+// Stop server running.
 func (server *Server) StopServer(){
     var error = server.App.Shutdown();
     if error != nil {
@@ -65,6 +70,7 @@ func (server *Server) StopServer(){
     }
 }
 
+// Logical about handle internal error when a request throw a Panic.
 func errorHandler(ctx *fiber.Ctx, err error) error {
     // Status code defaults to 500
     code := fiber.StatusInternalServerError
@@ -76,7 +82,8 @@ func errorHandler(ctx *fiber.Ctx, err error) error {
     return nil
 }
 
-func Logrequest(c *fiber.Ctx) error {
+// Little middleware that log a request when start and end it.
+func LogRequest(c *fiber.Ctx) error {
     log.Printf("Starting request: %v",c.Context().ID())
     err := c.Next()
     log.Printf("Request completed: %v",c.Context().ID())

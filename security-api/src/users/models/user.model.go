@@ -14,6 +14,7 @@ const (
 	Inactive
 )
 
+// Method to get the string of the status type.
 func (s Status) String() string{
 	return []string{"Active","Blocked","Inactive"}[s]
 }
@@ -25,6 +26,7 @@ const (
 	USER
 )
 
+// Method to get the string of the role type.
 func (s Role) String() string{
 	return []string{"ADMIN","USER"}[s]
 }

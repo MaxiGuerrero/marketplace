@@ -6,11 +6,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Interface to implement methods about JWT management.
 type JWTBuilder interface {
 	BuildToken(payload *Payload) string
 	ValidateToken(tokenString string) (*Payload,error)
 }
 
+// Struct that represent the payload of the JWT token.
 type Payload struct{
 	UserId primitive.ObjectID `json:"userId" bson:"_id,omitempty"`
 	Username string			`json:"username"`

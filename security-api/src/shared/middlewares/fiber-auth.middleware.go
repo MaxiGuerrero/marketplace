@@ -7,6 +7,7 @@ import (
 	jwtware "github.com/gofiber/jwt/v3"
 )
 
+// Middleware that is responsable to manage the authorization JWT token from a request.
 func NewAuthMiddleware() fiber.Handler {
 	return jwtware.New(jwtware.Config{
 		SigningKey: []byte(shared.GetConfig().JWTSecret),

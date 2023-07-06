@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Responsable to implement the logical database connection.
 type DbConnector struct{
 	client *mongo.Client
 	database string
@@ -18,6 +19,7 @@ type DbConnector struct{
 
 type Context context.Context
 
+// Create an mongo connector that will be used for the repositories via injection dependency.
 func CreateDbConnector(ctxParent Context,url string,database string) *DbConnector {
 	client, err := mongo.NewClient(options.Client().ApplyURI(url))
 	if err != nil {
@@ -37,6 +39,7 @@ func CreateDbConnector(ctxParent Context,url string,database string) *DbConnecto
 	return &DbConnector{client,database}
 }
 
+// Get the mongo collection that need a repository.
 func (connector DbConnector) GetCollection(collection string)*mongo.Collection{
 	return connector.client.Database(connector.database).Collection(collection);
 }

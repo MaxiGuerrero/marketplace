@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Configurations that need the server.
 type config struct {
 	DbConnection string
 	CostAlgorithmic int
@@ -18,6 +19,8 @@ type config struct {
 	Port int
 } 
 
+// Get variable configurations with its respective type that has been setted via environment variables or from .env file.
+// Those variables is use along of the system.
 func GetConfig() *config{
 	if os.Getenv("GO_ENV") == "develop" || os.Getenv("GO_ENV") == "" {
 		loadDotEnv()
@@ -34,7 +37,7 @@ func GetConfig() *config{
 	}
 }
 
-
+// Get variables from .env files.
 func loadDotEnv(){
 	err := godotenv.Load()
 	if err != nil {
@@ -42,6 +45,7 @@ func loadDotEnv(){
 	}
 }
 
+// Get URL API string either from env variable or a default URL.
 func getUrlApi() string{
 	urlApi, ok := os.LookupEnv("URL_API")
 	if !ok {
@@ -50,6 +54,7 @@ func getUrlApi() string{
 	return urlApi
 }
 
+// Get PORT API number either from env variable or a default PORT.
 func getPort() int{
 	portStr, ok := os.LookupEnv("PORT")
 	if !ok {

@@ -9,6 +9,7 @@ import (
 
 var validate = validator.New()
 
+// Register custom validation that will be use the library "validator".
 func RegisterValidation(){
 	// validates that an enum is within the interval
 	err := validate.RegisterValidation("role_enum_validation", func(fl validator.FieldLevel) bool {
@@ -24,6 +25,7 @@ func RegisterValidation(){
 	}
 }
 
+// Validate if a schema from a request is correct.
 func ValidateSchema(payload interface{}) error {
 	err:= validate.Struct(payload)
 	return err

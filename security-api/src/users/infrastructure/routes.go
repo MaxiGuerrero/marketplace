@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
+// Register routes about management of users.
 func RegisterRoutes(router fiber.Router, uc UserController){
 	jwt := middlewares.NewAuthMiddleware()
 	router.Post("/register",uc.CreateUser)

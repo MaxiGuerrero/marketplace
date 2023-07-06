@@ -7,10 +7,12 @@ import (
 	service "marketplace/security-api/src/users/service"
 )
 
+// This struct is responsable of manage injection dendencies of the system.
 type Dependencies struct{
 	UserController *UserController
 }
 
+// Initialize dependencies injecting objects and configurations.
 func InitializeDependencies(db *mongo.DbConnector) *Dependencies{
 	return &Dependencies{
 		UserController: NewUserController(*service.NewUserService(&UserRepository{*db},encrpyter.CreateEncrypter(config.GetConfig().CostAlgorithmic))),

@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Load swagger configuration from yaml an export it as string.
 func LoadDoc() string {
 	dir, _ := os.Getwd()
 	docsPath := filepath.Join(dir,"/src/docs/swagger.yaml")
@@ -19,6 +20,8 @@ func LoadDoc() string {
 	return string(setProperties(&swaggerFile))
 }
 
+// Set dynamic configuration that must be expose on the documentation endpoint.
+// For example: Set the url of the API.
 func setProperties(swaggerFile *[]byte) []byte{
 	var config map[string]interface{}
 	apiURL := env.GetConfig().UrlApi

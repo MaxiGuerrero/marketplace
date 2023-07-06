@@ -10,6 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// Repository that is responsable to manage queries and database connection about authentication users.
+// Also is responsable to manage database error connections, throw panic if a error exists.
 type AuthenticationRepository struct{
 	db database.DbConnector
 }

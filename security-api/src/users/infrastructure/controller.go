@@ -9,16 +9,19 @@ import (
 	jtoken "github.com/golang-jwt/jwt/v4"
 )
 
+// UserController is a controller that is responsable to manage request and responses.
 type UserController struct{
 	service models.IUserService
 }
 
+// Create an instance of the UserController with injection dependencies.
 func NewUserController(service models.IUserService) *UserController {
 	return &UserController{
 		service,
 	}
 }
 
+// Manage request and responses about create an user in the system.
 func (uc UserController) CreateUser(c *fiber.Ctx) error{
 	req := models.CreateUserRequest{}
 	if parseError := c.BodyParser(&req); parseError!=nil{
@@ -34,6 +37,7 @@ func (uc UserController) CreateUser(c *fiber.Ctx) error{
 	return c.Status(200).JSON(response.OK())
 }
 
+// Manage request and responses about update an user in the system.
 func (uc UserController) UpdateUser(c *fiber.Ctx) error{
 	user := c.Locals("user").(*jtoken.Token)
 	claims := user.Claims.(jtoken.MapClaims)
@@ -52,6 +56,7 @@ func (uc UserController) UpdateUser(c *fiber.Ctx) error{
 	return c.Status(200).JSON(response.OK())
 }
 
+// Manage request and responses about delete an user in the system.
 func (uc UserController) DeleteUser(c *fiber.Ctx) error{
 	user := c.Locals("user").(*jtoken.Token)
 	claims := user.Claims.(jtoken.MapClaims)
@@ -63,6 +68,7 @@ func (uc UserController) DeleteUser(c *fiber.Ctx) error{
 	return c.Status(200).JSON(response.OK())
 }
 
+// Manage the responses about get list of users in the system.
 func (uc UserController) GetUsers(c *fiber.Ctx) error{
 	user := c.Locals("user").(*jtoken.Token)
 	claims := user.Claims.(jtoken.MapClaims)

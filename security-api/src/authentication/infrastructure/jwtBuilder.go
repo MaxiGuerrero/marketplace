@@ -11,8 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Responsable to implement the JWT token.
 type JWTBuilder struct {}
 
+// Build token of a exists user.
 func (j JWTBuilder) BuildToken(payload *models.Payload) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userId": payload.UserId,
@@ -29,6 +31,7 @@ func (j JWTBuilder) BuildToken(payload *models.Payload) string {
 	return tokenString
 }
 
+// Validate if a token is correct.
 func (j JWTBuilder) ValidateToken(tokenString string) (*models.Payload,error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

@@ -14,10 +14,13 @@ import (
 
 var ctx context.Context = context.Background()
 
+// Repository that is responsable to manage queries and database connection about users.
+// Also is responsable to manage database error connections, throw panic if a error exists.
 type UserRepository struct{
 	db database.DbConnector
 }
 
+// Register an user in the mongo database.
 func (u UserRepository) Create(username,password,email,role string){
 	_,err := u.db.GetCollection("user").InsertOne(ctx,models.User{
 		Username: username,
@@ -34,6 +37,7 @@ func (u UserRepository) Create(username,password,email,role string){
 	log.Printf("User %v has been created",username)
 }
 
+// Get an user from the mongo database.
 func (u UserRepository) GetByUsername(username string) *models.User{
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
 	userFound := new(models.User)
@@ -47,6 +51,7 @@ func (u UserRepository) GetByUsername(username string) *models.User{
 	return userFound
 }
 
+// Update an exists user collection from the mongo database.
 func (u UserRepository) Update(username, newEmail string){
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
 	update := bson.M{
@@ -62,6 +67,7 @@ func (u UserRepository) Update(username, newEmail string){
 	log.Printf("User %v has been updated", username)
 }
 
+// Logical delete an exists and active user updating the user collection setting delete date and status inactive.
 func (u UserRepository) Delete(username string){
 	filter := bson.D{primitive.E{Key: "username", Value: username}}
 	update := bson.M{
@@ -77,6 +83,7 @@ func (u UserRepository) Delete(username string){
 	log.Printf("User %v has been deleted", username)
 }
 
+// Get list of users from the mongo database.
 func (u UserRepository) Get() *models.Users{
 	var users models.Users
 	cursor , err := u.db.GetCollection("user").Find(ctx,bson.D{})
