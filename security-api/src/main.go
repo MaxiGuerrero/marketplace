@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	authentication "marketplace/security-api/src/authentication/infrastructure"
 	"marketplace/security-api/src/healthcheck"
 	s "marketplace/security-api/src/server"
@@ -13,9 +12,6 @@ import (
 )
 
 func main(){
-	a := 1
-	a = 2
-	log.Printf("%v", a)
 	ctx := context.Background()
 	connector := mongo.CreateDbConnector(ctx,config.GetConfig().DbConnection,config.GetConfig().Database)
 	// Dependencies' containers by each module - run injections
