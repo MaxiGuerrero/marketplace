@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
-        uses: "./.github/templates/test"
+        uses: ./.github/templates/test
         with:
           salute: hiii
