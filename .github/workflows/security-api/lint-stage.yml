@@ -1,0 +1,21 @@
+name: Lint stage - Security API
+run-name: ${{ github.actor }} has made changes on repository bracnh ${{ github.ref }} with event ${{ github.event_name}}
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          check-latest: true
+          cache-dependency-path: security-api/go.sum
+          go-version-file: "security-api/go.mod"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
