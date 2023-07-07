@@ -31,6 +31,6 @@ jobs:
           cache-dependency-path: security-api/go.sum
           go-version-file: "security-api/go.mod"
       - name: Test build project
-        run: cd security-api && go build ./src -o ./security-api/dist/main.sh
+        run: cd security-api && go build ./src
       - name: Run unit testing
         run: cd security-api && go test ./src/.../tests -v
