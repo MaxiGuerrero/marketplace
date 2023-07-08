@@ -38,6 +38,7 @@ jobs:
 
   release-image:
     if: ${{github.ref_name}} == 'main' && ${{github.event_name}} == 'push'
+    needs: [lint, test]
     runs-on: ubuntu-latest
     env:
       IMAGE_URL: ghcr.io/maxiguerrero/marketplace/${{ github.ref_name }}/security-api:latest
