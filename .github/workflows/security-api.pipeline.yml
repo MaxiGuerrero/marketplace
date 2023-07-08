@@ -37,6 +37,7 @@ jobs:
         run: cd security-api && go test ./src/.../tests -v
 
   release-image:
+    if: ${{github.ref_name}} == 'main' && ${{github.event_name}} == 'push'
     runs-on: ubuntu-latest
     env:
       IMAGE_URL: ghcr.io/maxiguerrero/marketplace/${{ github.ref_name }}/security-api:latest
