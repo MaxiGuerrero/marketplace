@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -34,3 +35,21 @@ jobs:
         run: cd security-api && mkdir dist && go build -o dist/main ./src
       - name: Run unit testing
         run: cd security-api && go test ./src/.../tests -v
+
+  release-image:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_URL: ghcr.io/${{ github.repository }}/${{ github.ref_name }}/security-api:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to github repository
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build docker image
+        run: docker build -t ${{ env.IMAGE_URL }} .
+      - name: publish docker image
+        run: docker push ${{ env.IMAGE_URL }}
