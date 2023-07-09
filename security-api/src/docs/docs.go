@@ -12,7 +12,11 @@ import (
 // Load swagger configuration from yaml an export it as string.
 func LoadDoc() string {
 	dir, _ := os.Getwd()
-	docsPath := filepath.Join(dir,"/src/docs/swagger.yaml")
+	path := "/src/docs/swagger.yaml"
+	if os.Getenv("GO_ENV") == "production" {
+		path = "swagger.yaml"
+	}
+	docsPath := filepath.Join(dir,path)
 	swaggerFile, err := os.ReadFile(docsPath)
 	if err != nil {
 		log.Panicf("Error on load swagger doc: %v",err)
