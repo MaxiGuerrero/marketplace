@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "security-api/**"
+      - ".github/workflows/**"
   pull_request:
 
 jobs:
