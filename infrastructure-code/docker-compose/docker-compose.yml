@@ -14,7 +14,7 @@ services:
     environment:
       - DATABASE='marketplace'
       - COST_ALGORITHMIC='10'
-      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_CONNECTION=${DB_CONNECTION:-mongoserver}
     networks:
       - marketplace
 
