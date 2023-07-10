@@ -51,7 +51,7 @@ func CreateServer(port int,activateDocs bool) *Server{
         })
     }
     app.Use(recover.New())
-    return &Server{Port: 8080, App: app}
+    return &Server{Port: port, App: app}
 }
 
 // Run server on port configurated.
