@@ -1,0 +1,60 @@
+name: Pipeline - Stock API
+run-name: ${{ github.actor }} has made changes on branch ${{ github.ref }} with event ${{ github.event_name}}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "stocks-api/**"
+      - ".github/workflows/**"
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          check-latest: true
+          cache-dependency-path: stocks-api/go.sum
+          go-version-file: "stocks-api/go.mod"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          working-directory: stocks-api/src
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          check-latest: true
+          cache-dependency-path: stocks-api/go.sum
+          go-version-file: "stocks-api/go.mod"
+      - name: Test build project
+        run: cd stocks-api && mkdir dist && go build -o dist/main ./src
+      - name: Run unit testing
+        run: cd stocks-api && go test ./src/.../tests -v
+
+  release-image:
+    if: ${{github.ref_name}} == 'main' && ${{github.event_name}} == 'push'
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_URL: ghcr.io/maxiguerrero/marketplace/${{ github.ref_name }}/stocks-api:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to github repository
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build docker image
+        run: docker build -t ${{ env.IMAGE_URL }} ./stocks-api/
+      - name: publish docker image
+        run: docker push ${{ env.IMAGE_URL }}
