@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  termsOfService: "http://swagger.io/terms/"
+  title: stocks-api
+  license:
+    name: ISC
+servers:
+  - url: https://api.example.com/v1
+    description: Default
+paths:
+  "/register":
+    post:
+      tags:
+        - Product
+      summary: Product's register
+      description: User can register a new product into of the system.
+      operationId: registerProduct
+      requestBody:
+        $ref: "#/components/requestBodies/RegisterRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      tags:
+        - Product
+      summary: Product's update details
+      description: User can update a product's detail.
+      operationId: updateProduct
+      requestBody:
+        $ref: "#/components/requestBodies/ProductUpdateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  "/register/stock":
+    put:
+      tags:
+        - Product
+      summary: Product's update its stock
+      description: User can update a product's stock.
+      operationId: updateStock
+      requestBody:
+        $ref: "#/components/requestBodies/StockUpdateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    Success:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StandardResponse"
+    Unauthorized:
+      description: Access token is missing or is invalid
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalServerError:
+      description: Internal server error
+  requestBodies:
+    RegisterRequest:
+      description: "Register request schema"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RegisterProductSchema"
+    ProductUpdateRequest:
+      description: "Update product request schema"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UpdateProductSchema"
+    StockUpdateRequest:
+      description: "Update product request schema"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UpdateStockSchema"
+  schemas:
+    StandardResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Successful operation
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Invalid product"
+    RegisterProductSchema:
+      type: object
+      properties:
+        name:
+          type: string
+          example: name
+        description:
+          type: string
+          example: description
+        price:
+          type: number
+          example: 412.12
+        stock:
+          type: number
+          example: 10
+    UpdateProductSchema:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: asdsad1234
+        name:
+          type: string
+          example: name
+        description:
+          type: string
+          example: description
+        price:
+          type: number
+          example: 412.12
+    UpdateStockSchema:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: asdsad1234
+        stock:
+          type: number
+          example: 150
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: Page number
+      schema:
+        type: number
+        default: 1
+    page_size:
+      name: page_size
+      in: query
+      description: Limit the number of results
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    sort:
+      name: sort
+      in: query
+      description: Attribute to sort by
+      schema:
+        type: string
+    sort_dir:
+      name: sort_dir
+      in: query
+      description: Sorting direction
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
