@@ -1,5 +1,5 @@
 name: Pipeline - Security API
-run-name: ${{ github.actor }} has made changes on branch ${{ github.ref }} with event ${{ github.event_name}}
+run-name: "[security-api]${{ github.actor }} has made changes on branch ${{ github.ref_name }}"
 on:
   push:
     branches:
