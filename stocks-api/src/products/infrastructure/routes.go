@@ -1,9 +1,14 @@
 package infrastructure
 
-import "github.com/gofiber/fiber/v2"
+import (
+	middlewares "marketplace/stocks-api/src/shared/middlewares"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 func RegisterRoutes(router fiber.Router, productController *ProductController){
-	router.Post("/products",productController.RegisterProduct)
-	router.Put("/products",productController.UpdateProduct)
-	router.Put("/products/stock",productController.UpdateStock)
+	auth := middlewares.NewAuthMiddleware()
+	router.Post("/products",auth,productController.RegisterProduct)
+	router.Put("/products",auth,productController.UpdateProduct)
+	router.Put("/products/stock",auth,productController.UpdateStock)
 }

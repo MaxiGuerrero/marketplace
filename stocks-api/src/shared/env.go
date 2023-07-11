@@ -15,6 +15,8 @@ type config struct {
 	Database string
 	UrlApi string
 	Port int
+	SecurityApi string
+	Secure bool
 } 
 
 // Get variable configurations with its respective type that has been setted via environment variables or from .env file.
@@ -28,6 +30,8 @@ func GetConfig() *config{
 		Database: os.Getenv("DATABASE"),
 		UrlApi: getUrlApi(),
 		Port: getPort(),
+		SecurityApi: os.Getenv("SECURITY_API_URL"),
+		Secure: os.Getenv("SECURE") ==  "true",
 	}
 }
 

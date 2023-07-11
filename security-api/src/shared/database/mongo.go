@@ -21,13 +21,9 @@ type Context context.Context
 
 // Create an mongo connector that will be used for the repositories via injection dependency.
 func CreateDbConnector(ctxParent Context,url string,database string) *DbConnector {
-	client, err := mongo.NewClient(options.Client().ApplyURI(url))
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
 	ctx, cancel := context.WithTimeout(ctxParent,10* time.Second)
 	defer cancel()
-	err = client.Connect(ctx)
+	client, err := mongo.Connect(ctx,options.Client().ApplyURI(url))
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

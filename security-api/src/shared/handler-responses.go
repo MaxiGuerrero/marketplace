@@ -24,3 +24,7 @@ func Unauthorized() *Response{
 func InternalError(message string) *Response{
 	return &Response{Message: message}
 }
+
+func TokenValidated()*Response{
+	return &Response{Message: "Token is correct"}
+}

@@ -5,11 +5,11 @@ import (
 	"log"
 	docs "marketplace/security-api/src/docs"
 	responses "marketplace/security-api/src/shared"
-	"syscall"
-	"unsafe"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/swagger"
 )
 
@@ -22,24 +22,16 @@ type Server struct {
 
 // Create a instance of the server setting the port and if the swagger doc must be expose.
 func CreateServer(port int,activateDocs bool) *Server{
-	var mask uintptr
-	
-	// Get the current CPU affinity of the process
-	if _, _, err := syscall.RawSyscall(syscall.SYS_SCHED_GETAFFINITY, 0, uintptr(unsafe.Sizeof(mask)), uintptr(unsafe.Pointer(&mask))); err != 0 {
-        panic("Failed to get CPU affinity:")
-	}
-	fmt.Println("Current CPU affinity:", mask)
-
-	// Set the new CPU affinity
-	mask = 24
-	if _, _, err := syscall.RawSyscall(syscall.SYS_SCHED_SETAFFINITY, 0, uintptr(unsafe.Sizeof(mask)), uintptr(unsafe.Pointer(&mask))); err != 0 {
-        panic("Failed to set CPU affinity:")
-	}
-	fmt.Println("New CPU affinity:", mask)
     app := fiber.New(fiber.Config{
         ErrorHandler: errorHandler,
     })
-    app.Use(LogRequest)
+    // Configure logs
+    app.Use(requestid.New())
+    app.Use(logger.New(logger.Config{
+        Format: "[${time}]${locals:requestid}${method}${path}${status}${latency}\u200b\n",
+        TimeFormat: "02/01/2006:15:04:05",
+    }))
+    // Configure Swagger
     if(activateDocs){
         doc := docs.LoadDoc()
         app.Get("/docs/*", swagger.New(swagger.Config{
@@ -80,12 +72,4 @@ func errorHandler(ctx *fiber.Ctx, err error) error {
     }
     // Return from handler
     return nil
-}
-
-// Little middleware that log a request when start and end it.
-func LogRequest(c *fiber.Ctx) error {
-    log.Printf("Starting request: %v",c.Context().ID())
-    err := c.Next()
-    log.Printf("Request completed: %v",c.Context().ID())
-    return err
 }
