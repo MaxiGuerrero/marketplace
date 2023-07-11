@@ -68,8 +68,9 @@ func TestUpdateProductService(t *testing.T){
 		fakeRepository.On("GetProductById",id).Once().Return(product)
 		fakeRepository.On("UpdateProduct",id,name,description,price).Once()
 		// Act
-		service.UpdateProduct(id,name,description,price)
+		err := service.UpdateProduct(id,name,description,price)
 		// Assert
+		require.NoError(t,err)
 		require.True(t,fakeRepository.AssertCalled(t,"UpdateProduct",id,name,description,price))
 	})
 	t.Run("Product does not exists",func(t *testing.T){
@@ -104,8 +105,9 @@ func TestUpdateStockProductService(t *testing.T){
 		fakeRepository.On("GetProductById",id).Once().Return(product)
 		fakeRepository.On("UpdateStock",id,stock).Once()
 		// Act
-		service.UpdateStock(id,stock)
+		err := service.UpdateStock(id,stock)
 		// Assert
+		require.NoError(t,err)
 		require.True(t,fakeRepository.AssertCalled(t,"UpdateStock",id,stock))
 	})
 }
