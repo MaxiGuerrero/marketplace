@@ -57,3 +57,7 @@ func (p *ProductController) UpdateStock(c *fiber.Ctx) error{
 	}
 	return c.Status(200).JSON(response.OK())
 }
+
+func (p *ProductController) GetProducts(c *fiber.Ctx) error {
+	return c.Status(200).JSON(p.ProductService.GetAll())
+}

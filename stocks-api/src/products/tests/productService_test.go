@@ -4,6 +4,7 @@ import (
 	"marketplace/stocks-api/src/products/models"
 	services "marketplace/stocks-api/src/products/service"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -32,6 +33,11 @@ func (pr *FakeProductRepository) GetProductById(productId primitive.ObjectID) *m
 
 func (pr *FakeProductRepository) UpdateStock(productId primitive.ObjectID, stock int){
 	pr.Called(productId,stock)
+}
+
+func (ps *FakeProductRepository) GetAll() *[]models.Product{
+	args := ps.Called()
+	return args.Get(0).(*[]models.Product)
 }
 
 func TestRegisterProductService(t *testing.T){
@@ -109,5 +115,50 @@ func TestUpdateStockProductService(t *testing.T){
 		// Assert
 		require.NoError(t,err)
 		require.True(t,fakeRepository.AssertCalled(t,"UpdateStock",id,stock))
+	})
+	t.Run("Product does not exists",func(t *testing.T){
+		// Arrenge
+		const stock int = 150
+		id := primitive.NewObjectID()
+		fakeRepository.On("GetProductById",id).Once().Return(nil)
+		fakeRepository.On("UpdateStock",id,stock).Once()
+		// Act
+		err := service.UpdateStock(id,stock)
+		// Assert
+		require.Error(t,err)
+		require.True(t,fakeRepository.AssertNotCalled(t,"UpdateProduct",id,stock))
+	})
+}
+
+func TestGetProductService(t *testing.T){
+	fakeRepository := &FakeProductRepository{}
+	service := services.NewProductService(fakeRepository)
+	t.Run("Get list of products found", func(t *testing.T) {
+		// Arrenge
+		productsExpected := &[]models.Product{
+			{
+				ID: primitive.NewObjectID(),
+				Name: "product-a",
+				Description: "For everybody",
+				Stock: 10,
+				Price: 22.14,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+			{
+				ID: primitive.NewObjectID(),
+				Name: "product-b",
+				Description: "For everybody",
+				Stock: 10,
+				Price: 22.14,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+		}
+		fakeRepository.On("GetAll").Return(productsExpected).Once()
+		// Act
+		products := service.GetAll()
+		// Assert
+		require.Equal(t,productsExpected,products,"List of users must be equal")
 	})
 }

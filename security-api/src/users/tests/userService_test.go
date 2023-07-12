@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -211,6 +210,6 @@ func TestGetUsers(t *testing.T) {
 		// Act
 		users := service.GetUsers()
 		// Assert
-		assert.Equal(t, usersExpected, users, "Get list of users must")
+		require.Equal(t, usersExpected, users, "List of users must be equal")
 	})
 }

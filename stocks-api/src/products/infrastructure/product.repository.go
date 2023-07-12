@@ -85,3 +85,15 @@ func (pr *ProductRepository) UpdateStock(productId primitive.ObjectID, stock int
 	}
 	log.Printf("Product id %v has been updated its stock", productId.Hex())
 }
+
+func (pr *ProductRepository) GetAll() *[]models.Product{
+	var products []models.Product
+	cursor, err := pr.db.GetCollection("product").Find(ctx,bson.D{})
+	if err != nil{
+		log.Panicf("Error on get products: %v",err)
+	}
+	if err = cursor.All(ctx,&products);err != nil {
+		log.Panicf("Error on get products: %v",err)
+	}
+	return &products
+}

@@ -9,7 +9,7 @@ servers:
   - url: https://api.example.com/v1
     description: Default
 paths:
-  "/register":
+  "/products":
     post:
       tags:
         - Product
@@ -44,7 +44,22 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  "/register/stock":
+    get:
+      tags:
+        - Product
+      summary: Get Products
+      description: User can get all products in the market
+      operationId: GetProducts
+      responses:
+        "200":
+          $ref: "#/components/responses/Products"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  "/products/stock":
     put:
       tags:
         - Product
@@ -80,6 +95,12 @@ components:
             $ref: "#/components/schemas/Error"
     InternalServerError:
       description: Internal server error
+    Products:
+      description: List of products
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ListProductsSchema"
   requestBodies:
     RegisterRequest:
       description: "Register request schema"
@@ -154,6 +175,32 @@ components:
         stock:
           type: number
           example: 150
+    ListProductsSchema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: "1ABF2"
+          name:
+            type: string
+            example: Product-A
+          description:
+            type: string
+            example: Is a product
+          stock:
+            type: number
+            example: 50
+          price:
+            type: number
+            example: 48.51
+          created_at:
+            type: string
+            example: "2023-07-11T22:41:20.369Z"
+          updated_at:
+            type: string
+            example: "2023-07-11T22:41:20.369Z"
 
   securitySchemes:
     bearerAuth:

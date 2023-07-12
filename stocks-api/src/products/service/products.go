@@ -36,3 +36,7 @@ func (ps *ProductService) UpdateStock(productId primitive.ObjectID,stock int) er
 	ps.ProductRepository.UpdateStock(productId,stock)
 	return nil
 }
+
+func (ps *ProductService) GetAll() *[]models.Product{
+	return ps.ProductRepository.GetAll()
+}

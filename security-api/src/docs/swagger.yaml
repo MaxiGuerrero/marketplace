@@ -78,6 +78,21 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
+    get:
+      tags:
+        - User
+      summary: Get Users
+      description: User can get all users in the system
+      operationId: GetUsers
+      responses:
+        "200":
+          $ref: "#/components/responses/Users"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   responses:
     Success:
@@ -102,6 +117,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/TokenSchema"
+    Users:
+      description: List of products
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ListUsersSchema"
   requestBodies:
     LoginRequest:
       description: "Login request schema"
@@ -175,6 +196,32 @@ components:
           type: string
           format: email
           example: test@test.com
+    ListUsersSchema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: "1ABF2"
+          name:
+            type: string
+            example: Product-A
+          description:
+            type: string
+            example: Is a product
+          stock:
+            type: number
+            example: 50
+          price:
+            type: number
+            example: 48.51
+          created_at:
+            type: string
+            example: "2023-07-11T22:41:20.369Z"
+          updated_at:
+            type: string
+            example: "2023-07-11T22:41:20.369Z"
 
   securitySchemes:
     bearerAuth:

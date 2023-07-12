@@ -1,10 +1,13 @@
 package tests
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	controllers "marketplace/stocks-api/src/products/infrastructure"
+	"marketplace/stocks-api/src/products/models"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -30,6 +33,11 @@ func (ps *FakeProductService) UpdateProduct(productId primitive.ObjectID,name st
 func (ps *FakeProductService) UpdateStock(productId primitive.ObjectID,stock int) error{
 	args := ps.Called(productId,stock)
 	return args.Error(0)
+}
+
+func (ps *FakeProductService) GetAll() *[]models.Product{
+	args := ps.Called()
+	return args.Get(0).(*[]models.Product)
 }
 
 func TestProductRegisterController(t *testing.T){
@@ -184,5 +192,45 @@ func TestUpdateStockProductController(t *testing.T){
 		require.NoError(t,err,"Controller does not return an error")
 		utils.AssertEqual(t,`{"message":"product does not exists"}`,string(c.Response().Body()))
 		utils.AssertEqual(t,400,c.Response().StatusCode())
+	})
+}
+
+func TestGetProductsController(t *testing.T){
+	app := fiber.New()
+	c := app.AcquireCtx(&fasthttp.RequestCtx{})
+	defer app.ReleaseCtx(c)
+	c.Request().Header.SetContentType("application/json")
+	fakeService := &FakeProductService{}
+	controller := controllers.NewProductController(fakeService)
+	t.Run("Get list of products successfully, return 200",func(t *testing.T){
+		// Arrenge
+		productsExpected := &[]models.Product{
+			{
+				ID: primitive.NewObjectID(),
+				Name: "product-a",
+				Description: "For everybody",
+				Stock: 10,
+				Price: 22.14,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+			{
+				ID: primitive.NewObjectID(),
+				Name: "product-b",
+				Description: "For everybody",
+				Stock: 10,
+				Price: 22.14,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
+		}
+		fakeService.On("GetAll").Return(productsExpected).Once()
+		// Act
+		err := controller.GetProducts(c)
+		productsJson, _ := json.Marshal(productsExpected)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t,200,c.Response().StatusCode())
+		utils.AssertEqual(t,string(productsJson),string(c.Response().Body()))
 	})
 }
