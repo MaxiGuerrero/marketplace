@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Register routes about management of products.
 func RegisterRoutes(router fiber.Router, productController *ProductController){
 	auth := middlewares.NewAuthMiddleware()
 	router.Post("/products",auth,productController.RegisterProduct)

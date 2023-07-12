@@ -8,14 +8,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// ProductController is a controller that is responsable to manage request and responses.
 type ProductController struct {
 	ProductService models.IProductService
 }
 
+// Create an instance of the ProductController with injection dependencies.
 func NewProductController(productService models.IProductService) *ProductController{
 	return &ProductController{productService}
 }
 
+// Manage request and responses about register an product in the system.
 func (p *ProductController) RegisterProduct(c *fiber.Ctx) error{
 	req := models.RegisterProductRequest{}
 	if parseError := c.BodyParser(&req); parseError!=nil{
@@ -28,6 +31,7 @@ func (p *ProductController) RegisterProduct(c *fiber.Ctx) error{
 	return c.Status(200).JSON(response.OK())
 }
 
+// Manage request and responses about update an product in the system.
 func (p *ProductController) UpdateProduct(c *fiber.Ctx) error{
 	req := models.UpdateProductRequest{}
 	if parseError := c.BodyParser(&req); parseError!=nil{
@@ -43,6 +47,7 @@ func (p *ProductController) UpdateProduct(c *fiber.Ctx) error{
 	return c.Status(200).JSON(response.OK())
 }
 
+// Manage request and responses about update the stock of an product in the system.
 func (p *ProductController) UpdateStock(c *fiber.Ctx) error{
 	req := models.UpdateStockRequest{}
 	if parseError := c.BodyParser(&req); parseError!=nil{
@@ -58,6 +63,7 @@ func (p *ProductController) UpdateStock(c *fiber.Ctx) error{
 	return c.Status(200).JSON(response.OK())
 }
 
+// Manage request and responses about get list of products in the system.
 func (p *ProductController) GetProducts(c *fiber.Ctx) error {
 	return c.Status(200).JSON(p.ProductService.GetAll())
 }

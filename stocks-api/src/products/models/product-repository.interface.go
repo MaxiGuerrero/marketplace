@@ -2,6 +2,7 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
+// Interface to implements method about product query management.
 type IProductRepository interface {
 	RegisterProduct(name string, description string, price float32, stock int)
 	UpdateProduct(productId primitive.ObjectID,name string, description string, price float32)

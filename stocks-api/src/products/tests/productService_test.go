@@ -159,6 +159,6 @@ func TestGetProductService(t *testing.T){
 		// Act
 		products := service.GetAll()
 		// Assert
-		require.Equal(t,productsExpected,products,"List of users must be equal")
+		require.Equal(t,productsExpected,products,"List of products must be equal")
 	})
 }
