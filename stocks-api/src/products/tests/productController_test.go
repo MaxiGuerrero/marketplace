@@ -40,6 +40,14 @@ func (ps *FakeProductService) GetAll() *[]models.Product{
 	return args.Get(0).(*[]models.Product)
 }
 
+func (ps *FakeProductService) GetProductById(productId primitive.ObjectID) *models.Product{
+	args := ps.Called(productId)
+	if args.Get(0) == nil {
+		return nil
+	}
+	return args.Get(0).(*models.Product)
+}
+
 func TestProductRegisterController(t *testing.T){
 	app := fiber.New()
 	c := app.AcquireCtx(&fasthttp.RequestCtx{})
@@ -195,7 +203,7 @@ func TestUpdateStockProductController(t *testing.T){
 	})
 }
 
-func TestGetProductsController(t *testing.T){
+func TestGetAllProductsController(t *testing.T){
 	app := fiber.New()
 	c := app.AcquireCtx(&fasthttp.RequestCtx{})
 	defer app.ReleaseCtx(c)
@@ -228,6 +236,38 @@ func TestGetProductsController(t *testing.T){
 		// Act
 		err := controller.GetProducts(c)
 		productsJson, _ := json.Marshal(productsExpected)
+		// Assert
+		require.NoError(t,err,"Controller does not return an error")
+		utils.AssertEqual(t,200,c.Response().StatusCode())
+		utils.AssertEqual(t,string(productsJson),string(c.Response().Body()))
+	})
+}
+
+func TestGetProductController(t *testing.T){
+	app := fiber.New()
+	fastctx := &fasthttp.RequestCtx{}
+	var c *fiber.Ctx = app.AcquireCtx(fastctx)
+	defer app.ReleaseCtx(c)
+	c.Request().Header.SetContentType("application/json")
+	fakeService := &FakeProductService{}
+	controller := controllers.NewProductController(fakeService)
+	t.Run("Get product successfully, return 200",func(t *testing.T){
+		// Arrenge
+		idProduct := primitive.NewObjectID()
+		productExpected := &models.Product{
+			ID: idProduct,
+			Name: "product-a",
+			Description: "For everybody",
+			Stock: 10,
+			Price: 22.14,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		fakeService.On("GetProductById",productExpected.ID).Return(productExpected).Once()
+		c.Locals("id",idProduct.Hex())
+		// Act
+		err := controller.GetProduct(c)
+		productsJson, _ := json.Marshal(productExpected)
 		// Assert
 		require.NoError(t,err,"Controller does not return an error")
 		utils.AssertEqual(t,200,c.Response().StatusCode())

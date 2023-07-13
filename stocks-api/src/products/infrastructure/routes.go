@@ -13,4 +13,8 @@ func RegisterRoutes(router fiber.Router, productController *ProductController){
 	router.Put("/products",auth,productController.UpdateProduct)
 	router.Put("/products/stock",auth,productController.UpdateStock)
 	router.Get("/products",auth,productController.GetProducts)
+	router.Get("/products/:id",auth,func(c *fiber.Ctx) error {
+		c.Locals("id",c.Params("id"))
+		return c.Next()
+	},productController.GetProduct)
 }

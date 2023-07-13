@@ -130,7 +130,7 @@ func TestUpdateStockProductService(t *testing.T){
 	})
 }
 
-func TestGetProductService(t *testing.T){
+func TestGetAllProductService(t *testing.T){
 	fakeRepository := &FakeProductRepository{}
 	service := services.NewProductService(fakeRepository)
 	t.Run("Get list of products found", func(t *testing.T) {
@@ -160,5 +160,37 @@ func TestGetProductService(t *testing.T){
 		products := service.GetAll()
 		// Assert
 		require.Equal(t,productsExpected,products,"List of products must be equal")
+	})
+}
+
+func TestGetProductService(t *testing.T){
+	fakeRepository := &FakeProductRepository{}
+	service := services.NewProductService(fakeRepository)
+	t.Run("Get product found", func(t *testing.T) {
+		// Arrenge
+		productExpected := &models.Product{
+			ID: primitive.NewObjectID(),
+			Name: "product-a",
+			Description: "For everybody",
+			Stock: 10,
+			Price: 22.14,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		
+		fakeRepository.On("GetProductById",productExpected.ID).Return(productExpected).Once()
+		// Act
+		product := service.GetProductById(productExpected.ID)
+		// Assert
+		require.Equal(t,productExpected,product)
+	})
+	t.Run("Product does not exists",func(t *testing.T){
+		// Arrenge
+		id := primitive.NewObjectID()
+		fakeRepository.On("GetProductById",id).Once().Return(nil)
+		// Act
+		product := service.GetProductById(id)
+		// Assert
+		require.Nil(t,product)
 	})
 }

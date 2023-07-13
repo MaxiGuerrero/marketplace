@@ -6,6 +6,7 @@ import (
 	"marketplace/stocks-api/src/shared/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // ProductController is a controller that is responsable to manage request and responses.
@@ -66,4 +67,14 @@ func (p *ProductController) UpdateStock(c *fiber.Ctx) error{
 // Manage request and responses about get list of products in the system.
 func (p *ProductController) GetProducts(c *fiber.Ctx) error {
 	return c.Status(200).JSON(p.ProductService.GetAll())
+}
+
+// Manage request and responses about get one product by id in the system.
+func (p *ProductController) GetProduct(c *fiber.Ctx) error {
+	id := c.Locals("id").(string)
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	return c.Status(200).JSON(p.ProductService.GetProductById(objId))
 }

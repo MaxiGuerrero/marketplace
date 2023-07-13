@@ -50,3 +50,9 @@ func (ps *ProductService) UpdateStock(productId primitive.ObjectID,stock int) er
 func (ps *ProductService) GetAll() *[]models.Product{
 	return ps.ProductRepository.GetAll()
 }
+
+// Get product by ID.
+// Is possible return an business error if the product doesn't exists.
+func (ps *ProductService) GetProductById(productId primitive.ObjectID) *models.Product {
+	return ps.ProductRepository.GetProductById(productId)
+}
