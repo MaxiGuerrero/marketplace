@@ -1,0 +1,8 @@
+build
+dist
+node_modules
+logs
+coverage
+.husky
+.nyc_output
+.vscode

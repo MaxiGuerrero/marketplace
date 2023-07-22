@@ -1,0 +1,294 @@
+openapi: 3.0.0
+info:
+  version: '1.1.0'
+  termsOfService: 'http://swagger.io/terms/'
+  title: Payment API
+  license:
+    name: ISC
+  contact:
+    name: Maxi
+    email: maximilianoraulguerrero@gmail.com
+paths:
+  '/products/add':
+    post:
+      tags:
+        - Cart
+      summary: Add product to user's cart
+      description: Add a product on the user's cart.
+      operationId: addProduct
+      requestBody:
+        $ref: '#/components/requestBodies/addProductRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/CartRespose'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  '/products/remove':
+    post:
+      tags:
+        - Cart
+      summary: Remove product to user's cart
+      description: Remove a product on the user's cart.
+      operationId: removeProduct
+      requestBody:
+        $ref: '#/components/requestBodies/removeProductRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/CartRespose'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  '/checkout':
+    post:
+      tags:
+        - Cart
+      summary: User finish its buys
+      description: User finish its buys.
+      operationId: checkout
+      requestBody:
+        $ref: '#/components/requestBodies/CheckoutRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/CheckoutRespose'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+servers:
+  - url: '{protocol}://{domain}:{port}'
+    description: Default
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+      domain:
+        default: localhost
+      port:
+        default: '8082'
+components:
+  requestBodies:
+    addProductRequest:
+      description: Add product to a cart request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProductRequest'
+    removeProductRequest:
+      description: Remove product to a cart request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeleteProductRequest'
+    CheckoutRequest:
+      description: checkout request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeleteProductRequest'
+  responses:
+    Success:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardResponse'
+    Unauthorized:
+      description: Access token is missing or is invalid
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal server error
+    CartRespose:
+      description: Cart response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CartResponse'
+    CheckoutRespose:
+      description: it response with a ticket of the buy
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ticket'
+  schemas:
+    StandardResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Successful operation
+        status:
+          type: number
+          example: 200
+    CartResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: cartID
+          userId:
+            type: string
+            example: userID
+          products:
+            type: array
+            items:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  example: productId
+                amount:
+                  type: number
+                  example: 10
+          createdAt:
+            type: string
+            example: date
+          updatedAt:
+            type: string
+            example: date
+          paid:
+            type: boolean
+            example: false
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123gjx
+        userId:
+          type: string
+          example: bcd123
+        username:
+          type: string
+          example: pepe123
+        transactionDate:
+          type: string
+          example: date
+        total:
+          type: number
+          example: 4231
+        paymentMethod:
+          type: string
+          example: cash
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: 'product-A'
+              description:
+                type: string
+                example: this is a good product
+              price:
+                type: number
+                example: 4231
+              amount:
+                type: number
+                example: 1
+
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+        status:
+          type: number
+          example: 400
+    ErrorItem:
+      type: object
+      properties:
+        key:
+          type: string
+          example: app.login.invalidPassword
+        message:
+          type: string
+          example: Invalid user or password
+    ProductRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: id
+        amount:
+          type: number
+          example: 2
+    DeleteProductRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: id
+    CheckoutRequest:
+      type: object
+      properties:
+        paymentMethod:
+          type: string
+          example: cash
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: Page number
+      schema:
+        type: number
+        default: 1
+    page_size:
+      name: page_size
+      in: query
+      description: Limit the number of results
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    sort:
+      name: sort
+      in: query
+      description: Attribute to sort by
+      schema:
+        type: string
+    sort_dir:
+      name: sort_dir
+      in: query
+      description: Sorting direction
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
