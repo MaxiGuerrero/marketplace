@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import PaymentService from '@payments/services/payment.service';
 import { CheckoutRequest } from '@payments/models';
 import { User } from '@shared/index';
+import { IPaymentService } from '@payments/models/paymentService.interface';
 
 class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(private readonly paymentService: IPaymentService) {}
 
   checkout = async (req: Request, res: Response, next: NextFunction) => {
     try {

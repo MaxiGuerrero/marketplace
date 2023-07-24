@@ -1,8 +1,9 @@
 import { Cart, ICartRepository, ProductOnCart } from '@cart-management/models';
+import { ICartService } from '@cart-management/models/cartService.interface';
 import BusinessError from '@shared/handler/businessError';
 import logger from '@shared/utils/logger';
 
-class CartService {
+class CartService implements ICartService {
   constructor(private readonly repository: ICartRepository) {}
 
   async addProduct(

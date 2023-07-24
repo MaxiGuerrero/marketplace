@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import CartService from '@cart-management/services/cart.service';
 import { AddProductRequest, RemoveProductRequest } from '@cart-management/models';
 import { User } from '@shared/models/user';
+import { ICartService } from '@cart-management/models/cartService.interface';
 
 class CartController {
-  constructor(private readonly cartService: CartService) {}
+  constructor(private readonly cartService: ICartService) {}
 
   addProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
