@@ -1,5 +1,5 @@
 import winston from 'winston';
-import config from '@shared/env/env';
+import {config} from '@shared/index';
 
 let logger: winston.Logger;
 

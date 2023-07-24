@@ -49,7 +49,7 @@ async function executeCommand(command: string, path: string) {
     await copy('./src/shared/docs/swagger.yml', './dist/src/shared/docs/swagger.yml');
     await copy('./package.json', './dist/package.json');
     // Compile project
-    await executeCommand('tsc --project ./', './');
+    await executeCommand('tsc', './');
     logger.info('✔️ Project compiled successfully!');
   } catch (err) {
     logger.error(err);
