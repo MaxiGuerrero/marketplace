@@ -1,0 +1,61 @@
+name: Pipeline - Payment API
+run-name: "[payment-api]${{ github.actor }} has made changes on branch ${{ github.ref_name }}"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "payment-api/**"
+      - ".github/workflows/**"
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd payment-api
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd payment-api
+      - run: npm ci
+      - run: npm run test
+
+  release-image:
+    if: ${{github.ref_name}} == 'main' && ${{github.event_name}} == 'push'
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_URL: ghcr.io/maxiguerrero/marketplace/${{ github.ref_name }}/payment-api:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to github repository
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build docker image
+        run: docker build -t ${{ env.IMAGE_URL }} ./payment-api/
+      - name: publish docker image
+        run: docker push ${{ env.IMAGE_URL }}
