@@ -21,10 +21,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
-      - run: cd payment-api
-      - run: ls .
       - run: npm ci
+        working-directory: payment-api
       - run: npm run lint
+        working-directory: payment-api
 
   test:
     runs-on: ubuntu-latest
@@ -37,9 +37,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
-      - run: cd payment-api
       - run: npm ci
+        working-directory: payment-api
       - run: npm run test
+        working-directory: payment-api
 
   release-image:
     if: ${{github.ref_name}} == 'main' && ${{github.event_name}} == 'push'
