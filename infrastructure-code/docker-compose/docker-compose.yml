@@ -9,12 +9,17 @@ services:
           memory: 512M
     container_name: security-api
     restart: always
+    depends_on:
+      - mongo
     ports:
       - 8080:8080
     environment:
       - DATABASE='marketplace'
       - COST_ALGORITHMIC='10'
-      - DB_CONNECTION=${DB_CONNECTION:-mongoserver}
+      - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PATH=/security/
+      - VIRTUAL_DEST=/
     networks:
       - marketplace
 
@@ -26,13 +31,18 @@ services:
           memory: 512M
     container_name: stock-api
     restart: always
+    depends_on:
+      - mongo
     ports:
       - 8081:8081
     environment:
       - DATABASE='marketplace'
-      - DB_CONNECTION=${DB_CONNECTION:-mongoserver}
+      - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
       - SECURITY_API_URL='http://security-api:8080'
       - SECURE='true'
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PATH=/stock/
+      - VIRTUAL_DEST=/
     networks:
       - marketplace
 
@@ -43,13 +53,44 @@ services:
         limits:
           memory: 512M
     container_name: payment-api
+    depends_on:
+      - mongo
     restart: always
     ports:
       - 8082:8082
     environment:
       - DATABASE='marketplace'
-      - DB_CONNECTION=${DB_CONNECTION:-mongoserver}
+      - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
       - SECURITY_API_URL='http://security-api:8080'
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PATH=/payment/
+      - VIRTUAL_DEST=/
+    networks:
+      - marketplace
+
+  gateway:
+    image: jwilder/nginx-proxy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    container_name: gateway
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - marketplace
+
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: marketplace
     networks:
       - marketplace
 
