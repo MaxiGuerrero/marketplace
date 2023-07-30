@@ -27,6 +27,7 @@ func NewAuthMiddleware() fiber.Handler {
 		request.Header.Add("Authorization",authorization)
 		res, err := client.Do(request)
 		if err != nil {
+			log.Printf("Error on connect to Security API: %v", err.Error())
 			return c.Status(500).JSON(config.InternalError("Error on connect to Security API"))
 		}
 		defer res.Body.Close()
@@ -34,6 +35,7 @@ func NewAuthMiddleware() fiber.Handler {
 			body := &config.Response{}
 			err := json.NewDecoder(res.Body).Decode(body)
 			if err != nil {
+				log.Printf("Error on connect to Security API: %v", err.Error())
 				return c.Status(500).JSON(config.InternalError("Error on connect to Security API"))
 			}
 			return c.Status(res.StatusCode).JSON(body)
