@@ -70,7 +70,8 @@ export default class Server {
       );
     }
     // API routes prefix
-    this.app.use(this.router);
+    const prefix = process.env.PREFIX_URL || '/'
+    this.app.use(prefix,this.router);
     this.app.use(
       errorLogger({
         winstonInstance: logger,
