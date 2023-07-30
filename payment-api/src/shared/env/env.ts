@@ -10,6 +10,6 @@ export default {
   DOCS_ENDPOINT: '/docs',
   DIR_SWAGGER: process.env.DIR_SWAGGER || './src/shared/docs/swagger.yml',
   DB_CONNECTION: process.env.DB_CONNECTION || 'localhost',
-  SECURITY_API_URL: process.env.SECURITY_API_URL || 'http://localhost:8080/token/validate',
+  SECURITY_API_URL: process.env.SECURITY_API_URL || 'http://localhost:8080',
   PREFIX_URL: process.env.PREFIX_URL || '/'
 };

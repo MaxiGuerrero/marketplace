@@ -10,7 +10,7 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     if (!token) {
       return res.status(401).json({ error: 'Access token is missing or is invalid' });
     }
-    const result = await axios.post(config.SECURITY_API_URL, null, {
+    const result = await axios.post(`${config.SECURITY_API_URL}/token/validate`, null, {
       headers: {
         Authorization: `${token}`,
       },
