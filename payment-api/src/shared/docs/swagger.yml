@@ -64,18 +64,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 servers:
-  - url: '{protocol}://{domain}:{port}'
+  - url: https://api.example.com/v1
     description: Default
-    variables:
-      protocol:
-        enum:
-          - http
-          - https
-        default: http
-      domain:
-        default: localhost
-      port:
-        default: '8082'
 components:
   requestBodies:
     addProductRequest:

@@ -56,9 +56,16 @@ export default class Server {
       })
     );
     // Serve Swagger UI when not in production
+    const prefix = process.env.PREFIX_URL || '/'
     const swaggerDocument = YAML.load(config.DIR_SWAGGER || '');
     if (config.NODE_ENV !== 'production') {
-      this.app.use(config.DOCS_ENDPOINT, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+      const urlApi = process.env.URL_API || `http://localhost:${config.PORT}`
+      swaggerDocument.servers = [{
+        url: urlApi,
+        description: 'Default'
+      }]
+      const swaggerPrefix = prefix === '/' ? '' : prefix
+      this.app.use(swaggerPrefix+config.DOCS_ENDPOINT, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
       // Validate requests against defined OpenApi spec
       this.app.use(
         middleware({
@@ -70,7 +77,6 @@ export default class Server {
       );
     }
     // API routes prefix
-    const prefix = process.env.PREFIX_URL || '/'
     this.app.use(prefix,this.router);
     this.app.use(
       errorLogger({
