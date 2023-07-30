@@ -34,11 +34,11 @@ func CreateServer(port int,activateDocs bool) *Server{
     // Configure Swagger
     if(activateDocs){
         doc := docs.LoadDoc()
-        app.Get("/docs/*", swagger.New(swagger.Config{
+        app.Get("docs/*", swagger.New(swagger.Config{
             URL:         "/swagger/doc.json",
             DeepLinking: false,
 	    }))
-        app.Get("/swagger/doc.json", func(c *fiber.Ctx) error {
+        app.Get("swagger/doc.json", func(c *fiber.Ctx) error {
             return c.SendString(doc)
         })
     }
