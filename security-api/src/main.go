@@ -20,9 +20,9 @@ func main(){
 	// Create server
 	server := s.CreateServer(config.GetConfig().Port,true)
 	// Register Routes
-	authentication.RegisterRoutes(server.App,*authDependencies.AuthenticationController)
-	users.RegisterRoutes(server.App,*usersDependencies.UserController)
-	healthcheck.RegisterRoutes(server.App)
+	authentication.RegisterRoutes(*server.Router,*authDependencies.AuthenticationController)
+	users.RegisterRoutes(*server.Router,*usersDependencies.UserController)
+	healthcheck.RegisterRoutes(*server.Router)
 	// Register custom validation
 	utils.RegisterValidation()
 	// Start Server
