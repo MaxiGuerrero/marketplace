@@ -5,6 +5,7 @@ import (
 	"log"
 	docs "marketplace/stocks-api/src/docs"
 	responses "marketplace/stocks-api/src/shared"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -17,7 +18,8 @@ import (
 // This server implement the library "Fiber".
 type Server struct {
 	Port int
-    App *fiber.App
+    Router *fiber.Router
+    app *fiber.App
 }
 
 // Create a instance of the server setting the port and if the swagger doc must be expose.
@@ -25,6 +27,8 @@ func CreateServer(port int,activateDocs bool) *Server{
     app := fiber.New(fiber.Config{
         ErrorHandler: errorHandler,
     })
+    // Configure Prefix group
+    router := app.Group(getPrefix())
     // Configure logs
     app.Use(requestid.New())
     app.Use(logger.New(logger.Config{
@@ -34,21 +38,21 @@ func CreateServer(port int,activateDocs bool) *Server{
     // Configure Swagger
     if(activateDocs){
         doc := docs.LoadDoc()
-        app.Get("/docs/*", swagger.New(swagger.Config{
-            URL:         "/swagger/doc.json",
+        router.Get("/docs/*", swagger.New(swagger.Config{
+            URL:         getPrefix()+"/swagger/doc.json",
             DeepLinking: false,
 	    }))
-        app.Get("/swagger/doc.json", func(c *fiber.Ctx) error {
+        router.Get("/swagger/doc.json", func(c *fiber.Ctx) error {
             return c.SendString(doc)
         })
     }
     app.Use(recover.New())
-    return &Server{Port: port, App: app}
+    return &Server{Port: port, Router: &router, app:app}
 }
 
 // Run server on port configurated.
 func (server *Server) StartServer(){
-    var error = server.App.Listen(fmt.Sprintf(":%v", server.Port))
+    var error = server.app.Listen(fmt.Sprintf(":%v", server.Port))
     if error != nil {
         log.Fatalln("Error to start server: ", error)
     }
@@ -56,7 +60,7 @@ func (server *Server) StartServer(){
 
 // Stop server running.
 func (server *Server) StopServer(){
-    var error = server.App.Shutdown();
+    var error = server.app.Shutdown();
     if error != nil {
         log.Fatalln("Error to stop server: ", error)
     }
@@ -72,4 +76,12 @@ func errorHandler(ctx *fiber.Ctx, err error) error {
     }
     // Return from handler
     return nil
+}
+
+func getPrefix() string{
+	prefix, ok := os.LookupEnv("PREFIX_URL")
+	if !ok {
+		return "/"
+	}
+	return prefix
 }

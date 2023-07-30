@@ -17,8 +17,8 @@ func main(){
 	// Create server
 	server := s.CreateServer(config.GetConfig().Port,true)
 	// Register Routes
-	products.RegisterRoutes(server.App,productsDependencies.ProductsController)
-	healthcheck.RegisterRoutes(server.App)
+	products.RegisterRoutes(*server.Router,productsDependencies.ProductsController)
+	healthcheck.RegisterRoutes(*server.Router)
 	// Start Server
 	server.StartServer()
 }
