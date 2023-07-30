@@ -56,7 +56,7 @@ export default class Server {
       })
     );
     // Serve Swagger UI when not in production
-    const prefix = process.env.PREFIX_URL || '/'
+    const prefix = config.PREFIX_URL
     const swaggerDocument = YAML.load(config.DIR_SWAGGER || '');
     if (config.NODE_ENV !== 'production') {
       const urlApi = process.env.URL_API || `http://localhost:${config.PORT}`
