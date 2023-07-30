@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	config "marketplace/stocks-api/src/shared"
 	"net/http"
 
@@ -20,6 +21,7 @@ func NewAuthMiddleware() fiber.Handler {
 		urlSec := fmt.Sprintf("%v/token/validate",config.GetConfig().SecurityApi)
 		request, err := http.NewRequestWithContext(c.Context(),"POST",urlSec,nil)
 		if err != nil {
+			log.Printf("Error on connect to Security API: %v", err.Error())
 			return c.Status(500).JSON(config.InternalError("Error on connect to Security API"))
 		}
 		request.Header.Add("Authorization",authorization)

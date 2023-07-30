@@ -24,7 +24,7 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     return next();
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      logger.debug(`Security api response with status: ${error.response?.status}`);
+      logger.debug(`Security api response with status: ${error.response?.status}: ${error.response?.data}`);
       return res.status(401).json({ error: 'Access token is missing or is invalid' });
     }
     logger.error(error);

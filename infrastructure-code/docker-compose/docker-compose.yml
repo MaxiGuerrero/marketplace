@@ -12,14 +12,16 @@ services:
     depends_on:
       - mongo
     ports:
-      - 8080:8080
+      - 8080
     environment:
       - DATABASE='marketplace'
       - COST_ALGORITHMIC='10'
       - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
       - VIRTUAL_HOST=localhost
       - VIRTUAL_PATH=/security/
-      - VIRTUAL_DEST=/
+      - PREFIX_URL=/security
+      - URL_API=http://localhost/security
+      - SECURE=true
     networks:
       - marketplace
 
@@ -34,15 +36,17 @@ services:
     depends_on:
       - mongo
     ports:
-      - 8081:8081
+      - 8081
     environment:
       - DATABASE='marketplace'
       - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
-      - SECURITY_API_URL='http://security-api:8080'
+      - SECURITY_API_URL='http://gateway/security'
       - SECURE='true'
       - VIRTUAL_HOST=localhost
       - VIRTUAL_PATH=/stock/
-      - VIRTUAL_DEST=/
+      - PREFIX_URL=/stock
+      - URL_API=http://localhost/stock
+      - SECURE=true
     networks:
       - marketplace
 
@@ -57,14 +61,16 @@ services:
       - mongo
     restart: always
     ports:
-      - 8082:8082
+      - 8080
     environment:
       - DATABASE='marketplace'
       - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
-      - SECURITY_API_URL='http://security-api:8080'
+      - SECURITY_API_URL='http://gateway/security'
       - VIRTUAL_HOST=localhost
       - VIRTUAL_PATH=/payment/
-      - VIRTUAL_DEST=/
+      - PREFIX_URL=/payment
+      - URL_API=http://localhost/payment
+      - SECURE=true
     networks:
       - marketplace
 
