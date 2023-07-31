@@ -22,6 +22,7 @@ func NewAuthMiddleware() fiber.Handler {
 			return c.Status(401).JSON(config.Unauthorized())
 		}
 		urlSec := fmt.Sprintf("%v/token/validate",config.GetConfig().SecurityApi)
+		log.Printf("Send token to %v: ",urlSec)
 		request, err := http.NewRequestWithContext(c.Context(),"POST",urlSec,nil)
 		if err != nil {
 			log.Printf("Error on generate new request: %v", err.Error())
