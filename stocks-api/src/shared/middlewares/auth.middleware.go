@@ -21,13 +21,13 @@ func NewAuthMiddleware() fiber.Handler {
 		urlSec := fmt.Sprintf("%v/token/validate",config.GetConfig().SecurityApi)
 		request, err := http.NewRequestWithContext(c.Context(),"POST",urlSec,nil)
 		if err != nil {
-			log.Printf("Error on connect to Security API: %v", err.Error())
+			log.Printf("Error on generate new request: %v", err.Error())
 			return c.Status(500).JSON(config.InternalError("Error on connect to Security API"))
 		}
 		request.Header.Add("Authorization",authorization)
 		res, err := client.Do(request)
 		if err != nil {
-			log.Printf("Error on connect to Security API: %v", err.Error())
+			log.Printf("Error on do connection request: %v", err.Error())
 			return c.Status(500).JSON(config.InternalError("Error on connect to Security API"))
 		}
 		defer res.Body.Close()
