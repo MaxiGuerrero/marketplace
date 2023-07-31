@@ -91,7 +91,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeleteProductRequest'
+            $ref: '#/components/schemas/CheckoutRequest'
   responses:
     Success:
       description: Successful operation
