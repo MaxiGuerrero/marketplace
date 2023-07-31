@@ -13,6 +13,8 @@ paths:
     post:
       tags:
         - Product
+      security:
+        - bearerAuth: []
       summary: Product's register
       description: User can register a new product into of the system.
       operationId: registerProduct
@@ -30,6 +32,8 @@ paths:
     put:
       tags:
         - Product
+      security:
+        - bearerAuth: []
       summary: Product's update details
       description: User can update a product's detail.
       operationId: updateProduct
@@ -47,6 +51,8 @@ paths:
     get:
       tags:
         - Product
+      security:
+        - bearerAuth: []
       summary: Get Products
       description: User can get all products in the market
       operationId: GetProducts
@@ -63,6 +69,8 @@ paths:
     put:
       tags:
         - Product
+      security:
+        - bearerAuth: []
       summary: Product's update its stock
       description: User can update a product's stock.
       operationId: updateStock
@@ -201,7 +209,6 @@ components:
           updated_at:
             type: string
             example: "2023-07-11T22:41:20.369Z"
-
   securitySchemes:
     bearerAuth:
       type: http

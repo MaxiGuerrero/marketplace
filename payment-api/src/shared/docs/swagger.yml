@@ -13,6 +13,8 @@ paths:
     post:
       tags:
         - Cart
+      security:
+        - bearerAuth: []
       summary: Add product to user's cart
       description: Add a product on the user's cart.
       operationId: addProduct
@@ -31,6 +33,8 @@ paths:
     post:
       tags:
         - Cart
+      security:
+        - bearerAuth: []
       summary: Remove product to user's cart
       description: Remove a product on the user's cart.
       operationId: removeProduct
@@ -49,6 +53,8 @@ paths:
     post:
       tags:
         - Cart
+      security:
+        - bearerAuth: []
       summary: User finish its buys
       description: User finish its buys.
       operationId: checkout
