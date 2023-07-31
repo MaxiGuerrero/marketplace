@@ -1,9 +1,9 @@
-import { IPaymentInterface, Ticket } from '@payments/models';
+import { IMqConnector, IPaymentInterface, ProductOnCart, Ticket } from '@payments/models';
 import BusinessError from '@shared/handler/businessError';
 import { ObjectId } from 'mongodb';
 
 class PaymentService {
-  constructor(private readonly repository: IPaymentInterface) {}
+  constructor(private readonly repository: IPaymentInterface, private readonly mqConnector: IMqConnector) {}
 
   async checkout(
     userId: string,
@@ -49,6 +49,8 @@ class PaymentService {
       username,
     };
     await this.repository.saveTicket(ticket);
+    // Call asynchronous to stock-api about products that has been sold
+    cart.products.forEach((product) => this.mqConnector.sendMessage<ProductOnCart>(product));
     return ticket;
   }
 }
