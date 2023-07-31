@@ -18,6 +18,10 @@ func NewAuthMiddleware() fiber.Handler {
 		}
 		client := &http.Client{}
 		authorization := c.Get("Authorization")
+		log.Printf("autorization value: %v",authorization)
+		if authorization == "" {
+			return c.Status(401).JSON(config.Unauthorized())
+		}
 		urlSec := fmt.Sprintf("%v/token/validate",config.GetConfig().SecurityApi)
 		request, err := http.NewRequestWithContext(c.Context(),"POST",urlSec,nil)
 		if err != nil {
