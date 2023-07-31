@@ -87,7 +87,7 @@ func (pr *ProductRepository) UpdateStock(productId primitive.ObjectID, stock int
 }
 
 func (pr *ProductRepository) GetAll() *[]models.Product{
-	var products []models.Product
+	var products []models.Product = []models.Product{}
 	cursor, err := pr.db.GetCollection("product").Find(ctx,bson.D{})
 	if err != nil{
 		log.Panicf("Error on get products: %v",err)

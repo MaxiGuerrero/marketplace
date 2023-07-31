@@ -40,7 +40,7 @@ services:
     environment:
       - DATABASE=marketplace
       - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
-      - SECURITY_API_URL=http://gateway/security
+      - SECURITY_API_URL=http://security-api:8080/security
       - SECURE='true'
       - VIRTUAL_HOST=localhost
       - VIRTUAL_PATH=/stock/
@@ -65,7 +65,7 @@ services:
     environment:
       - DATABASE=marketplace
       - DB_CONNECTION=${DB_CONNECTION:-mongodb://root:password@mongo:27017/}
-      - SECURITY_API_URL=http://gateway/security
+      - SECURITY_API_URL=http://security-api:8080/security
       - VIRTUAL_HOST=localhost
       - VIRTUAL_PATH=/payment/
       - PREFIX_URL=/payment
