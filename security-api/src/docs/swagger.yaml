@@ -186,6 +186,11 @@ components:
           type: string
           format: email
           example: test@test.com
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
     TokenSchema:
       type: object
       properties:
