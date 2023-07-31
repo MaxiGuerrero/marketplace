@@ -18,7 +18,6 @@ func NewAuthMiddleware() fiber.Handler {
 		}
 		client := &http.Client{}
 		authorization := c.Get("Authorization")
-		log.Printf("autorization value: %v",authorization)
 		if authorization == "" {
 			return c.Status(401).JSON(config.Unauthorized())
 		}
