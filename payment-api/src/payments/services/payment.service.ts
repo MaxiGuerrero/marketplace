@@ -50,7 +50,7 @@ class PaymentService {
     };
     await this.repository.saveTicket(ticket);
     // Call asynchronous to stock-api about products that has been sold
-    cart.products.forEach((product) => this.mqConnector.sendMessage<ProductOnCart>(product));
+    this.mqConnector.sendMessage<ProductOnCart[]>(cart.products);
     return ticket;
   }
 }

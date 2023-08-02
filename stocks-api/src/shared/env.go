@@ -17,6 +17,7 @@ type config struct {
 	Port int
 	SecurityApi string
 	Secure bool
+	MqServerUrl string
 } 
 
 // Get variable configurations with its respective type that has been setted via environment variables or from .env file.
@@ -32,6 +33,7 @@ func GetConfig() *config{
 		Port: getPort(),
 		SecurityApi: os.Getenv("SECURITY_API_URL"),
 		Secure: os.Getenv("SECURE") ==  "true",
+		MqServerUrl: getMqServerUrl(),
 	}
 }
 
@@ -60,4 +62,12 @@ func getPort() int{
 	}
 	port , _ := strconv.Atoi(portStr)
 	return port
+}
+
+func getMqServerUrl() string {
+	urlMq, ok := os.LookupEnv("MQ_SERVER_URL")
+	if !ok {
+		return "tcp://127.0.0.1:9000"
+	}
+	return urlMq
 }

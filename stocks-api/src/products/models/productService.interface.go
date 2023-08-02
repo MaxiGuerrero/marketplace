@@ -9,4 +9,5 @@ type IProductService interface {
 	UpdateStock(productId primitive.ObjectID,stock int) error
 	GetAll() *[]Product
 	GetProductById(productId primitive.ObjectID) *Product
+	ReciveCheckout(products *[]ProductOnCart)
 }

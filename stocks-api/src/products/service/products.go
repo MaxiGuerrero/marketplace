@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"log"
 	"marketplace/stocks-api/src/products/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -55,4 +56,16 @@ func (ps *ProductService) GetAll() *[]models.Product{
 // Is possible return an business error if the product doesn't exists.
 func (ps *ProductService) GetProductById(productId primitive.ObjectID) *models.Product {
 	return ps.ProductRepository.GetProductById(productId)
+}
+
+func (ps *ProductService) ReciveCheckout(products *[]models.ProductOnCart){
+	for _,product := range *products {
+		productFound := ps.ProductRepository.GetProductById(product.ProductId)
+		newStock := productFound.Stock - product.Amount
+		if (newStock < 0){
+			log.Printf("Stock on product %v not reach", productFound.Name);
+			return
+		}
+		ps.ProductRepository.UpdateStock(product.ProductId,newStock)
+	}
 }

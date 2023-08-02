@@ -48,6 +48,10 @@ func (ps *FakeProductService) GetProductById(productId primitive.ObjectID) *mode
 	return args.Get(0).(*models.Product)
 }
 
+func (ps *FakeProductService) ReciveCheckout(products *[]models.ProductOnCart){
+	ps.Called(products)
+}
+
 func TestProductRegisterController(t *testing.T){
 	app := fiber.New()
 	c := app.AcquireCtx(&fasthttp.RequestCtx{})

@@ -19,6 +19,8 @@ func main(){
 	// Register Routes
 	products.RegisterRoutes(*server.Router,productsDependencies.ProductsController)
 	healthcheck.RegisterRoutes(*server.Router)
+	// Initialize MQ
+	products.InitializeBroker(productsDependencies.ProductsController.ProductService)
 	// Start Server
 	server.StartServer()
 }
