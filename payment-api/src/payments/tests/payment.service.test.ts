@@ -9,7 +9,11 @@ const repository = {
   saveTicket: jest.fn(),
 };
 
-const service = new PaymentService(repository);
+const connector = {
+  sendMessage: jest.fn(),
+};
+
+const service = new PaymentService(repository, connector);
 
 const userId = '1';
 const username = 'user';
@@ -101,6 +105,7 @@ describe('Payment service', () => {
       expect(repository.findProductByID).toHaveBeenCalledWith(product._id.toHexString());
       expect(repository.checkout).toHaveBeenCalledWith(cart);
       expect(repository.saveTicket).toHaveBeenCalled();
+      expect(connector.sendMessage).toHaveBeenCalledWith(cart.products);
     });
   });
 });

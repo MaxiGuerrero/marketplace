@@ -19,6 +19,8 @@ jobs:
           check-latest: true
           cache-dependency-path: stocks-api/go.sum
           go-version-file: "stocks-api/go.mod"
+      - name: Preinstall dependencies
+        run: apt-get install libzmq3-dev && apt-get install libczmq-dev
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -34,6 +36,8 @@ jobs:
           check-latest: true
           cache-dependency-path: stocks-api/go.sum
           go-version-file: "stocks-api/go.mod"
+      - name: Preinstall dependencies
+        run: apt-get install libzmq3-dev && apt-get install libczmq-dev
       - name: Test build project
         run: cd stocks-api && mkdir dist && go build -o dist/main ./src
       - name: Run unit testing
