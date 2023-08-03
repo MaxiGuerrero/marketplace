@@ -28,6 +28,9 @@ class CartService implements ICartService {
       );
       if (productExistCart) {
         productExistCart.amount += amount;
+        if (product.stock < productExistCart.amount) {
+          return 'Insufficient stock';
+        }
       } else {
         const newArticle: ProductOnCart = {
           productId: product._id,

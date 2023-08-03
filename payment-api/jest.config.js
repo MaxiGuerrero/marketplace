@@ -14,4 +14,5 @@ module.exports = {
   },
   coveragePathIgnorePatterns: ['/node_modules/', '/config/', '.*/index.ts$', '.*/app.ts$', '/models/', '/routes/'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  resetMocks: false,
 };
