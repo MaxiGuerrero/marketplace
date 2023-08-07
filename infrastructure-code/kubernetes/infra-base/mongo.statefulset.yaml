@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  selector:
+    matchLabels:
+      app: mongo 
+  serviceName: "mongo"
+  replicas: 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo
+        ports:
+        - containerPort: 27017
+          name: mongo
+          resources: ## Define limits of resources
+            requests:
+              memory: 128M
+            limits:
+              memory: 258M
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service #DNS of the service
+spec:
+  selector:
+    app: mongo-service
+  ports:
+    - protocol: TCP
+      port: 27017 #Port of the service
+      targetPort: 27017 #Port of the app target

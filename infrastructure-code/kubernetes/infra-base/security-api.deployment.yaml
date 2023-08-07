@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-api-deployment
+  labels:
+    app: security-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: security-api
+  template:
+    metadata:
+      labels:
+        app: security-api
+    spec:
+      containers:
+        - name: security-api
+          image: ghcr.io/maxiguerrero/marketplace/main/security-api:latest ## Set image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources: ## Define limits of resources
+            requests:
+              memory: 128M
+            limits:
+              memory: 258M
+          envFrom:
+            - secretRef:
+                name: database-connection-secret
+            - configMapRef:
+                name: general-config
+          env:
+            - name: COST_ALGORITHMIC
+              value: 10
+            - name: URL_API
+              value: http://localhost/security
+            - name: PREFIX_URL
+              value: /security
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-api-service #DNS of the service
+spec:
+  selector:
+    app: security-api
+  ports:
+    - protocol: TCP
+      port: 8080 #Port of the service
+      targetPort: 8080 #Port of the app target

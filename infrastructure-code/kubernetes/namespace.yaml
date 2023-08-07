@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: marketplace
+  labels:
+    name: marketplace
+  ## annotations:
+    ## If you have installed downscaler, you can horizontal scaling
+    # downscaler/uptime: "Mon-Fri 08:30-18:15 America/Buenos_Aires"
+    ## If you have configurated a toleration in your group node, you can put all your pods from this namespace into of that group nodes.
+    # scheduler.alpha.kubernetes.io/defaultTolerations: '[{"Key": "node", "Operator": "Equal", "Value": "true", "Effect": "NoSchedule"}]'

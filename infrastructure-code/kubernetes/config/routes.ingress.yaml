@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: routes-marketplace-ingress
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /security
+            pathType: Prefix
+            backend:
+              service:
+                name: security-api-service
+                port:
+                  number: 8080
+    - host: localhost
+      http:
+        paths:
+          - path: /payment
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-api-service
+                port:
+                  number: 8080
+    - host: localhost
+      http:
+        paths:
+          - path: /stock
+            pathType: Prefix
+            backend:
+              service:
+                name: stock-api-service
+                port:
+                  number: 8081
+  # tls:
+  #   - hosts:
+  #       - foo.com
+  #     secretName: foo-tls

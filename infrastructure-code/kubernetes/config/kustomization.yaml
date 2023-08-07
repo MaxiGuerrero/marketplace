@@ -1,0 +1,4 @@
+resources:
+  - "database-creds.secret.yaml"
+  - "general.config.yaml"
+  - "routes.ingress.yaml"

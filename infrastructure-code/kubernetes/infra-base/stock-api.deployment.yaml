@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-api-deployment
+  labels:
+    app: stock-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: stock-api
+  template:
+    metadata:
+      labels:
+        app: stock-api
+    spec:
+      containers:
+        - name: stock-api
+          image: ghcr.io/maxiguerrero/marketplace/main/stock-api:latest ## Set image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          resources: ## Define limits of resources
+            requests:
+              memory: 128M
+            limits:
+              memory: 258M
+          envFrom:
+            - secretRef:
+                name: database-connection-secret
+            - configMapRef:
+                name: general-config
+          env:
+            - name: URL_API
+              value: http://localhost/stock
+            - name: PREFIX_URL
+              value: /stock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-api-service #DNS of the service
+spec:
+  selector:
+    app: stock-api
+  ports:
+    - protocol: TCP
+      port: 8081 #Port of the service
+      targetPort: 8081 #Port of the app target

@@ -1,0 +1,5 @@
+resources:
+  - "mongo.statefulset.yaml"
+  - "payment-api.deployment.yaml"
+  - "security-api.deployment.yaml"
+  - "stock-api.deployment.yaml"

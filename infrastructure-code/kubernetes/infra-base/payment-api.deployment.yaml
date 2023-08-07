@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-api-deployment
+  labels:
+    app: payment-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: payment-api
+  template:
+    metadata:
+      labels:
+        app: payment-api
+    spec:
+      containers:
+        - name: payment-api
+          image: ghcr.io/maxiguerrero/marketplace/main/payment-api:latest ## Set image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources: ## Define limits of resources
+            requests:
+              memory: 128M
+            limits:
+              memory: 258M
+          envFrom:
+            - secretRef:
+                name: database-connection-secret
+            - configMapRef:
+                name: general-config
+          env:
+            - name: URL_API
+              value: http://localhost/payment
+            - name: PREFIX_URL
+              value: /payment
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-api-service #DNS of the service
+spec:
+  selector:
+    app: payment-api
+  ports:
+    - protocol: TCP
+      port: 8080 #Port of the service
+      targetPort: 8080 #Port of the app target

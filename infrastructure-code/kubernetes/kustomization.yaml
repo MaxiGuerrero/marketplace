@@ -1,0 +1,6 @@
+resources:
+  - namespace.yaml
+  - config
+  - infra-base
+
+namespace: marketplace

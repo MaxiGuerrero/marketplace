@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: general-config
+data:
+  SECURE: "true"
+  SECURITY_API_URL: http://security-api-service:8080/
